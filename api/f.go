@@ -43,7 +43,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, err)
 	}
 
-	http.Redirect(w, r, "http://code2go.dev", http.StatusFound)
+	http.Redirect(w, r, "http://code2go.dev/data", http.StatusFound)
 
 	for i := range rvs {
 
