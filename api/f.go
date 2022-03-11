@@ -2,6 +2,7 @@ package handler
 
 import (
 	"fmt"
+	"html/template"
 	"net/http"
 	"os"
 	//"time"
@@ -11,6 +12,16 @@ import (
 
 type DATA map[string]f.Value
 type rv f.RefV
+
+type Todo struct {
+	Title string
+	Done  bool
+}
+
+type TodoPageData struct {
+	PageTitle string
+	Todos     []Todo
+}
 
 func Handler(w http.ResponseWriter, r *http.Request) {
 
@@ -45,7 +56,19 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 
 	//http.Redirect(w, r, "http://code2go.dev/data", http.StatusFound)
 
+	tmpl := template.Must(template.ParseFiles("t1.html"))
+	d := TodoPageData{
+		PageTitle: "My TODO list",
+		Todos: []Todo{
+			{Title: "Task 1", Done: false},
+			{Title: "Task 2", Done: true},
+			{Title: "Task 3", Done: true},
+		},
+	}
+	tmpl.Execute(w, d)
+
 	for i := range rvs {
 		fmt.Fprint(w, rvs[i].ID)
 	}
+
 }
