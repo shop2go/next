@@ -57,7 +57,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		//fmt.Fprint(w, rvs[i].ID)
 	}
 
-	w.Header().Set("Content-Type", "text/plain")
+	w.Header().Set("Content-Type", "text/html")
 	w.Header().Set("Content-Length", strconv.Itoa(len(str)))
 	w.Write([]byte(str))
 
