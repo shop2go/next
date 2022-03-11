@@ -2,10 +2,10 @@ package handler
 
 import (
 	"fmt"
-	//"html/template"
 	"net/http"
 	"os"
 	"strconv"
+	"text/template"
 	//"time"
 
 	f "github.com/fauna/faunadb-go/v5/faunadb"
@@ -50,15 +50,21 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 
 	for i := range rvs {
 
-		str = str + rvs[i].ID + `
-		<br>
-		`
-
-		//fmt.Fprint(w, rvs[i].ID)
+		fmt.Fprint(w, rvs[i].ID)
 	}
 
-	w.Header().Set("Content-Type", "text/html")
+	sweaters := struct {
+		Material string
+		Count    uint
+	}{"wool", 17}
+	tmpl, err := template.New("test").Parse("{{.Count}} items are made of {{.Material}}")
+	if err != nil {
+		panic(err)
+	}
+	tmpl.Execute(w, sweaters)
+
+	/*w.Header().Set("Content-Type", "text/html")
 	w.Header().Set("Content-Length", strconv.Itoa(len(str)))
-	w.Write([]byte(str))
+	w.Write([]byte(str))*/
 
 }
