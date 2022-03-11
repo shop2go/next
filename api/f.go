@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"strconv"
+	//"strconv"
 	"text/template"
 	//"time"
 
@@ -19,7 +19,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	var (
 		data DATA
 		rvs  []rv
-		str  string
+		//str  string
 	)
 
 	ep := f.Endpoint("https://db.fauna.com:443")
