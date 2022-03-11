@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	//"strconv"
-	"html/template"
+	"strconv"
+	//"html/template"
 	//"time"
 
 	f "github.com/fauna/faunadb-go/v5/faunadb"
@@ -48,21 +48,44 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 
 	//http.Redirect(w, r, "http://code2go.dev/data", http.StatusFound)
 
+	str := `
+	<!DOCTYPE html>
+	<html lang="en">
+		 <head>
+				<meta charset="UTF-8">
+				<meta name="viewport" content="width=device-width, initial-scale=1.0">
+				<meta http-equiv="X-UA-Compatible" content="ie=edge">
+				<title>CODE2GO</title>
+				<!-- CSS -->
+				<!-- Add Material font (Roboto) and Material icon as needed -->
+				<link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,500,500i,700,700i|Roboto+Mono:300,400,700|Roboto+Slab:300,400,700" rel="stylesheet">
+				<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+				<!-- Add Material CSS, replace Bootstrap CSS -->
+				<link href="https://assets.medienwerk.now.sh/material.min.css" rel="stylesheet">
+				</head>
+				<body style="background-color: #bcbcbc;">
+					   <div class="container" id="data" style="color:white; font-size:30px;">
+					   <ul class="list-group">
+	`
+
 	for i := range rvs {
 
-		fmt.Fprint(w, rvs[i].ID)
+		str = str + `
+		<li class="list-group-item">
+		` + rvs[i].ID +
+			`</li><br>`
 	}
 
-	sweaters := struct {
-		Material string
-		Count    uint
-	}{"wool", 17}
-	tmpl, _ := template.New("data").Parse("<h2>{{.Count}} items are made of {{.Material}}</h2>")
+	str = str + `
+	</ul>
+							  </div>
+							  <!-- Then Material JavaScript on top of Bootstrap JavaScript -->
+<script src="https://assets.medienwerk.now.sh/material.min.js"></script>
+							  </body>
+							  </html>`
 
-	tmpl.Execute(w, sweaters)
-
-	/*w.Header().Set("Content-Type", "text/html")
+	w.Header().Set("Content-Type", "text/html")
 	w.Header().Set("Content-Length", strconv.Itoa(len(str)))
-	w.Write([]byte(str))*/
+	w.Write([]byte(str))
 
 }
