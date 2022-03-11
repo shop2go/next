@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"os"
 	//"strconv"
-	"text/template"
+	"html/template"
 	//"time"
 
 	f "github.com/fauna/faunadb-go/v5/faunadb"
@@ -57,7 +57,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		Material string
 		Count    uint
 	}{"wool", 17}
-	tmpl, _ := template.New("data").Parse("<Callout type=´warning´ emoji=´⚠️´>{{.Count}} items are made of {{.Material}}</Callout>")
+	tmpl, _ := template.New("data").Parse("<h2>{{.Count}} items are made of {{.Material}}</h2>")
 
 	tmpl.Execute(w, sweaters)
 
