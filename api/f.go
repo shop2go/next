@@ -2,9 +2,10 @@ package handler
 
 import (
 	"fmt"
-	"html/template"
+	//"html/template"
 	"net/http"
 	"os"
+	"strconv"
 	//"time"
 
 	f "github.com/fauna/faunadb-go/v5/faunadb"
@@ -13,21 +14,12 @@ import (
 type DATA map[string]f.Value
 type rv f.RefV
 
-type Todo struct {
-	Title string
-	Done  bool
-}
-
-type TodoPageData struct {
-	PageTitle string
-	Todos     []Todo
-}
-
 func Handler(w http.ResponseWriter, r *http.Request) {
 
 	var (
 		data DATA
 		rvs  []rv
+		str  string
 	)
 
 	ep := f.Endpoint("https://db.fauna.com:443")
@@ -56,19 +48,17 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 
 	//http.Redirect(w, r, "http://code2go.dev/data", http.StatusFound)
 
-	tmpl := template.Must(template.ParseFiles("../public/t1.html"))
-	d := TodoPageData{
-		PageTitle: "My TODO list",
-		Todos: []Todo{
-			{Title: "Task 1", Done: false},
-			{Title: "Task 2", Done: true},
-			{Title: "Task 3", Done: true},
-		},
-	}
-	tmpl.Execute(w, d)
-
 	for i := range rvs {
-		fmt.Fprint(w, rvs[i].ID)
+
+		str = str + rvs[i].ID + `
+		<br>
+		`
+
+		//fmt.Fprint(w, rvs[i].ID)
 	}
+
+	w.Header().Set("Content-Type", "text/plain")
+	w.Header().Set("Content-Length", strconv.Itoa(len(str)))
+	w.Write([]byte(str))
 
 }
