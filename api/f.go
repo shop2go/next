@@ -56,7 +56,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 
 	//http.Redirect(w, r, "http://code2go.dev/data", http.StatusFound)
 
-	tmpl := template.Must(template.ParseFiles("./t1.html"))
+	tmpl := template.Must(template.ParseFiles("../t1.html"))
 	d := TodoPageData{
 		PageTitle: "My TODO list",
 		Todos: []Todo{
