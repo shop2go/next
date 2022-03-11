@@ -57,10 +57,8 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		Material string
 		Count    uint
 	}{"wool", 17}
-	tmpl, err := template.New("test").Parse("{{.Count}} items are made of {{.Material}}")
-	if err != nil {
-		panic(err)
-	}
+	tmpl, _ := template.New("data").Parse("<Callout type=´warning´ emoji=´⚠️´>{{.Count}} items are made of {{.Material}}</Callout>")
+
 	tmpl.Execute(w, sweaters)
 
 	/*w.Header().Set("Content-Type", "text/html")
