@@ -80,9 +80,9 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	for i := range rvs {
 
 		str = str + `
-		<li class="list-group-item">
+		<br><li class="list-group-item">
 		` + rvs[i].ID +
-			`</li><br>`
+			`</li>`
 	}
 
 	str = str + `
