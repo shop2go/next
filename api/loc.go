@@ -17,7 +17,7 @@ type LOC struct {
 	Coordinates string `json:"Coordinates",omitempty`
 }
 
-func Handler(w http.ResponseWriter, r *http.Request) {
+func Loc(w http.ResponseWriter, r *http.Request) {
 
 	resp, err := http.Get("https://raw.githubusercontent.com/ovrclk/un-locode/master/data/code-list_json.json")
 	if err != nil {
@@ -26,7 +26,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	//We Read the response body on the line below.
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Fatalln(err)
+		fmt.Fprint(w, err)
 	}
 
 	var l []LOC

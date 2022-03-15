@@ -14,7 +14,7 @@ import (
 type DATA map[string]f.Value
 type rv f.RefV
 
-func Handler(w http.ResponseWriter, r *http.Request) {
+func DB(w http.ResponseWriter, r *http.Request) {
 
 	var (
 		data DATA
