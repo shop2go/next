@@ -19,7 +19,7 @@ type LOC struct {
 
 func Loc(w http.ResponseWriter, r *http.Request) {
 
-	http.Redirect(w, r, "https://loc.code2go.dev/data", http.StatusFound)
+	http.Redirect(w, r, "https://loc.code2go.dev", http.StatusFound)
 
 	resp, err := http.Get("https://raw.githubusercontent.com/ovrclk/un-locode/master/data/code-list_json.json")
 	if err != nil {
