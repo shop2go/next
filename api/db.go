@@ -1,7 +1,9 @@
 package handler
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"strconv"
@@ -21,6 +23,23 @@ func DB(w http.ResponseWriter, r *http.Request) {
 		rvs  []rv
 		//str  string
 	)
+
+	resp, err := http.Get("https://gist.githubusercontent.com/ssskip/5a94bfcd2835bf1dea52/raw/3b2e5355eb49336f0c6bc0060c05d927c2d1e004/ISO3166-1.alpha2.json")
+	if err != nil {
+		fmt.Fprint(w, err)
+	}
+	//We Read the response body on the line below.
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Fprint(w, err)
+	}
+
+	l := make(map[string]string)
+
+	err = json.Unmarshal(body, &l)
+	if err != nil {
+		fmt.Fprint(w, err)
+	}
 
 	ep := f.Endpoint("https://db.fauna.com:443")
 
@@ -80,10 +99,13 @@ func DB(w http.ResponseWriter, r *http.Request) {
 
 	for i := range rvs {
 
-		str = str + `
+		if _, ok := l[rvs[i].ID]; ok {
+			str = str + `
 		<br><li class="list-group-item">
-		` + rvs[i].ID +
-			`</li>`
+		` + l[rvs[i].ID] +
+				`</li>`
+
+		}
 	}
 
 	str = str + `
