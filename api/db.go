@@ -100,10 +100,10 @@ func DB(w http.ResponseWriter, r *http.Request) {
 				<br>
 				<div class="container-sm" id="data" style="color:white; font-size:30px;">
 				<div class="form-outline mb-4" method="POST">
-				<div class="input-group">
+
 				<button type="submit" class="btn btn-outline-primary">search</button>
 				<input type="search" name="city" class="form-control rounded" placeholder="city or select country below" aria-label="Search" aria-describedby="search-addon" />
-				</div
+
 				</div><br><br>
 
 					   <ul class="list-group">
