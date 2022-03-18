@@ -69,7 +69,7 @@ func DB(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 
-	case "GET":
+	case "POST":
 
 		str := `
 	<!DOCTYPE html>
@@ -131,7 +131,7 @@ func DB(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Length", strconv.Itoa(len(str)))
 		w.Write([]byte(str))
 
-	case "POST":
+	case "GET":
 
 		fmt.Fprint(w, "test")
 
