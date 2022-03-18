@@ -67,7 +67,11 @@ func DB(w http.ResponseWriter, r *http.Request) {
 
 	//http.Redirect(w, r, "http://code2go.dev/data", http.StatusFound)
 
-	str := `
+	switch r.Method {
+
+	case "GET":
+
+		str := `
 	<!DOCTYPE html>
 	<html lang="en">
 		 <head>
@@ -96,25 +100,25 @@ func DB(w http.ResponseWriter, r *http.Request) {
 				<div class="container-sm" id="data" style="color:white; font-size:30px;">
 				<div class="input-group">
 				<button type="button" class="btn btn-outline-primary">search</button>
-				<input type="search" class="form-control rounded" placeholder="search" aria-label="Search" aria-describedby="search-addon" />
+				<input type="search" class="form-control rounded" placeholder="enter city or select country" aria-label="Search" aria-describedby="search-addon" />
 
 </div><br><br>
 
 					   <ul class="list-group">
 	`
 
-	for i := range rvs {
+		for i := range rvs {
 
-		if _, ok := l[rvs[i].ID]; ok {
-			str = str + `
+			if _, ok := l[rvs[i].ID]; ok {
+				str = str + `
 		<br><li class="list-group-item">
 		` + l[rvs[i].ID] +
-				`</li>`
+					`</li>`
 
+			}
 		}
-	}
 
-	str = str + `
+		str = str + `
 	</ul>
 							  </div>
 							  <script
@@ -123,8 +127,14 @@ func DB(w http.ResponseWriter, r *http.Request) {
 							  </body>
 							  </html>`
 
-	w.Header().Set("Content-Type", "text/html")
-	w.Header().Set("Content-Length", strconv.Itoa(len(str)))
-	w.Write([]byte(str))
+		w.Header().Set("Content-Type", "text/html")
+		w.Header().Set("Content-Length", strconv.Itoa(len(str)))
+		w.Write([]byte(str))
+
+	case "POST":
+
+		fmt.Fprint(w, "test")
+
+	}
 
 }
