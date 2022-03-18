@@ -94,6 +94,7 @@ func DB(w http.ResponseWriter, r *http.Request) {
 				<body style="background-color: #bcbcbc;">
 				<br>
 				<div class="container-sm" id="data" style="color:white; font-size:30px;">
+				<div class="input-group">
 				<div class="form-outline mb-4" method="POST">
 
 				<button type="submit" class="btn btn-outline-primary">search</button>
