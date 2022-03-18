@@ -65,14 +65,9 @@ func DB(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, err)
 	}
 
-	for {
-		//http.Redirect(w, r, "http://code2go.dev/data", http.StatusFound)
+	//http.Redirect(w, r, "http://code2go.dev/data", http.StatusFound)
 
-		switch r.Method {
-
-		case "GET":
-
-			str := `
+	str := `
 	<!DOCTYPE html>
 	<html lang="en">
 		 <head>
@@ -109,18 +104,18 @@ func DB(w http.ResponseWriter, r *http.Request) {
 					   <ul class="list-group">
 	`
 
-			for i := range rvs {
+	for i := range rvs {
 
-				if _, ok := l[rvs[i].ID]; ok {
-					str = str + `
+		if _, ok := l[rvs[i].ID]; ok {
+			str = str + `
 		<br><li class="list-group-item">
 		` + l[rvs[i].ID] +
-						`</li>`
+				`</li>`
 
-				}
-			}
+		}
+	}
 
-			str = str + `
+	str = str + `
 	</ul>
 							  </div>
 							  <script
@@ -129,18 +124,8 @@ func DB(w http.ResponseWriter, r *http.Request) {
 							  </body>
 							  </html>`
 
-			w.Header().Set("Content-Type", "text/html")
-			w.Header().Set("Content-Length", strconv.Itoa(len(str)))
-			w.Write([]byte(str))
-
-		case "POST":
-
-			r.ParseForm()
-
-			fmt.Fprint(w, r.FormValue("city"))
-
-		}
-
-	}
+	w.Header().Set("Content-Type", "text/html")
+	w.Header().Set("Content-Length", strconv.Itoa(len(str)))
+	w.Write([]byte(str))
 
 }
