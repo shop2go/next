@@ -93,10 +93,11 @@ func DB(w http.ResponseWriter, r *http.Request) {
 				</head>
 				<body style="background-color: #bcbcbc;">
 				<br>
-				<div class="container-md" id="data" style="color:white; font-size:30px;">
+				<div class="container-sm" id="data" style="color:white; font-size:30px;">
 				<div class="input-group">
-  <input type="search" class="form-control rounded" placeholder="search" aria-label="Search" aria-describedby="search-addon" />
-  <button type="button" class="btn btn-outline-primary">search</button>
+				<button type="button" class="btn btn-outline-primary">search</button>
+				<input type="search" class="form-control rounded" placeholder="search" aria-label="Search" aria-describedby="search-addon" />
+
 </div><br><br>
 
 					   <ul class="list-group">
