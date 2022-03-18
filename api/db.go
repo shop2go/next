@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"sort"
 	"strconv"
 	//"html/template"
 	//"time"
@@ -65,9 +66,25 @@ func DB(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, err)
 	}
 
+	sort.SliceStable(rvs, func(i, j int) bool {
+		return rvs[i].ID < rvs[j].ID
+	})
+
 	//http.Redirect(w, r, "http://code2go.dev/data", http.StatusFound)
 
-	str := `
+	for {
+
+		switch r.Method {
+
+		case "POST":
+
+			r.ParseForm()
+
+			fmt.Fprint(w, r.FormValue("city"))
+
+		case "GET":
+
+			str := `
 	<!DOCTYPE html>
 	<html lang="en">
 		 <head>
@@ -99,24 +116,24 @@ func DB(w http.ResponseWriter, r *http.Request) {
 
 				<button type="submit" class="btn btn-outline-primary">search</button>
 				<input type="search" name="city" class="form-control rounded" placeholder="city or select country below" aria-label="Search" aria-describedby="search-addon" />
-
+				</div>
 				</div><br><br>
 
 					   <ul class="list-group">
 	`
 
-	for i := range rvs {
+			for i := range rvs {
 
-		if _, ok := l[rvs[i].ID]; ok {
-			str = str + `
+				if _, ok := l[rvs[i].ID]; ok {
+					str = str + `
 		<br><li class="list-group-item">
 		` + l[rvs[i].ID] +
-				`</li>`
+						`</li>`
 
-		}
-	}
+				}
+			}
 
-	str = str + `
+			str = str + `
 	</ul>
 							  </div>
 							  <script
@@ -125,8 +142,12 @@ func DB(w http.ResponseWriter, r *http.Request) {
 							  </body>
 							  </html>`
 
-	w.Header().Set("Content-Type", "text/html")
-	w.Header().Set("Content-Length", strconv.Itoa(len(str)))
-	w.Write([]byte(str))
+			w.Header().Set("Content-Type", "text/html")
+			w.Header().Set("Content-Length", strconv.Itoa(len(str)))
+			w.Write([]byte(str))
+
+		}
+
+	}
 
 }
