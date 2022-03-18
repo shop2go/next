@@ -93,11 +93,12 @@ func DB(w http.ResponseWriter, r *http.Request) {
 				</head>
 				<body style="background-color: #bcbcbc;">
 				<br>
+				<div class="container" id="data" style="color:white; font-size:30px;">
 				<div class="input-group">
   <input type="search" class="form-control rounded" placeholder="search" aria-label="Search" aria-describedby="search-addon" />
   <button type="button" class="btn btn-outline-primary">search</button>
 </div>><br><br>
-					   <div class="container" id="data" style="color:white; font-size:30px;">
+
 					   <ul class="list-group">
 	`
 
@@ -117,8 +118,7 @@ func DB(w http.ResponseWriter, r *http.Request) {
 							  </div>
 							  <script
 							  type="text/javascript"
-							  src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.10.2/mdb.min.js"
-							></script>
+							  src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.10.2/mdb.min.js"></script>
 							  </body>
 							  </html>`
 
