@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>code2go</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.10.2/mdb.min.css" rel="stylesheet" />
+
+</head>
+
+<body style="background-color: #bcbcbc;">
+    <br>
+    <div class="container-sm" id="data" style="color:white; font-size:24px;">
+        <form class="form-outline mb-4" method="POST">
+            <div class="input-group">
+                <div class="form-outline">
+                    <input type="search" id="city" name="city" class="form-control" />
+                    <label class="form-label" for="city">a city</label>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </form>
+        <br>
+        <br>
+        <ul class="list-group">
+            <br>
+            <li class="list-group-item">
+                {{.}}
+            </li>
+        </ul>
+    </div>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.10.2/mdb.min.js"></script>
+</body>
+
+</html>
