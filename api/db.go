@@ -170,7 +170,7 @@ func DB(w http.ResponseWriter, r *http.Request) {
 
 		}
 
-		resp, err = http.Get("https://gist.githubusercontent.com/mmaedel/00dbb8cc7416c8afe7b0ce441bc48a17/raw/848f18e6a67d7257101177c4b1048b6a136da5a3/tmpl.html")
+		resp, err = http.Get("https://gist.githubusercontent.com/mmaedel/00dbb8cc7416c8afe7b0ce441bc48a17/raw/644fe32f270ac1485f58b94d83dcd21b9cdebdf2/tmpl2.html")
 		if err != nil {
 			fmt.Fprint(w, err)
 		}
@@ -200,7 +200,7 @@ func DB(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		resp, err = http.Get("https://gist.githubusercontent.com/mmaedel/00dbb8cc7416c8afe7b0ce441bc48a17/raw/848f18e6a67d7257101177c4b1048b6a136da5a3/tmpl.html")
+		resp, err = http.Get("https://gist.githubusercontent.com/mmaedel/00dbb8cc7416c8afe7b0ce441bc48a17/raw/644fe32f270ac1485f58b94d83dcd21b9cdebdf2/tmpl1.html")
 		if err != nil {
 			fmt.Fprint(w, err)
 		}
