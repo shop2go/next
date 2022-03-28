@@ -15,6 +15,7 @@ import (
 
 type LOC struct {
 	City        string `json:"Name"`
+	Country     string
 	CountryCODE string `json:"Country"`
 	CityCODE    string `json:"Location"`
 	SubDIV      string `json:"Subdivision"`
@@ -24,7 +25,7 @@ type LOC struct {
 type DATA map[string]f.Value
 type rv f.RefV
 
-func DB(w http.ResponseWriter, r *http.Request) {
+func Data(w http.ResponseWriter, r *http.Request) {
 
 	var (
 		data DATA
@@ -42,9 +43,9 @@ func DB(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, err)
 	}
 
-	l := make(map[string]string)
+	country := make(map[string]string)
 
-	err = json.Unmarshal(body, &l)
+	err = json.Unmarshal(body, &country)
 	if err != nil {
 		fmt.Fprint(w, err)
 	}
@@ -108,6 +109,20 @@ func DB(w http.ResponseWriter, r *http.Request) {
 
 		for i := range l {
 
+			for j := range rvs {
+
+				if rvs[j].ID == l[i].CityCODE {
+
+					l[i].Country = country[rvs[j].ID]
+
+					break
+
+				}
+
+			}
+
+			//l[i].Country =
+
 			city := strings.ToUpper(l[i].City)
 
 			if city == d {
@@ -170,7 +185,7 @@ func DB(w http.ResponseWriter, r *http.Request) {
 
 		}
 
-		resp, err = http.Get("https://gist.githubusercontent.com/mmaedel/00dbb8cc7416c8afe7b0ce441bc48a17/raw/f83fe71e77c53c0a2a4f2de00787847c42ea21f3/tmpl2.html")
+		resp, err = http.Get("https://gist.githubusercontent.com/mmaedel/00dbb8cc7416c8afe7b0ce441bc48a17/raw/35ec77c668868de32b220b42437a59b9ef1f742e/tmpl2.html")
 		if err != nil {
 			fmt.Fprint(w, err)
 		}
@@ -193,9 +208,9 @@ func DB(w http.ResponseWriter, r *http.Request) {
 
 		for i := range rvs {
 
-			if _, ok := l[rvs[i].ID]; ok {
+			if _, ok := country[rvs[i].ID]; ok {
 
-				s = append(s, l[rvs[i].ID])
+				s = append(s, country[rvs[i].ID])
 
 			}
 		}
