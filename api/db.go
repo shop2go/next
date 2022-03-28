@@ -173,6 +173,8 @@ func DB(w http.ResponseWriter, r *http.Request) {
 
 		}
 
+		fmt.Fprint(w, m)
+
 		resp, err = http.Get("https://gist.githubusercontent.com/mmaedel/00dbb8cc7416c8afe7b0ce441bc48a17/raw/cbca25d2bf333bd580a140226524546531a019ab/tmpl.html")
 		if err != nil {
 			fmt.Fprint(w, err)
