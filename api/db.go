@@ -9,8 +9,6 @@ import (
 	"os"
 	"sort"
 	"strings"
-	//"strconv"
-	"time"
 
 	f "github.com/fauna/faunadb-go/v5/faunadb"
 )
@@ -90,8 +88,6 @@ func DB(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprint(w, err)
 		}
 
-		time.Sleep(3e7)
-
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
 			fmt.Fprint(w, err)
@@ -103,8 +99,6 @@ func DB(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			fmt.Fprint(w, err)
 		}
-
-		fmt.Fprint(w, l)
 
 		m := make([]LOC, 0)
 
@@ -176,7 +170,7 @@ func DB(w http.ResponseWriter, r *http.Request) {
 
 		}
 
-		resp, err = http.Get("https://gist.githubusercontent.com/mmaedel/00dbb8cc7416c8afe7b0ce441bc48a17/raw/cbca25d2bf333bd580a140226524546531a019ab/tmpl.html")
+		resp, err = http.Get("https://gist.githubusercontent.com/mmaedel/00dbb8cc7416c8afe7b0ce441bc48a17/raw/848f18e6a67d7257101177c4b1048b6a136da5a3/tmpl.html")
 		if err != nil {
 			fmt.Fprint(w, err)
 		}
@@ -206,7 +200,7 @@ func DB(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		resp, err = http.Get("https://gist.githubusercontent.com/mmaedel/00dbb8cc7416c8afe7b0ce441bc48a17/raw/cbca25d2bf333bd580a140226524546531a019ab/tmpl.html")
+		resp, err = http.Get("https://gist.githubusercontent.com/mmaedel/00dbb8cc7416c8afe7b0ce441bc48a17/raw/848f18e6a67d7257101177c4b1048b6a136da5a3/tmpl.html")
 		if err != nil {
 			fmt.Fprint(w, err)
 		}
