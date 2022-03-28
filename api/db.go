@@ -96,12 +96,14 @@ func DB(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprint(w, err)
 		}
 
-		var l, m []LOC
+		l := make([]LOC, 0)
 
 		err = json.Unmarshal(body, &l)
 		if err != nil {
 			fmt.Fprint(w, err)
 		}
+
+		m := make([]LOC, 0)
 
 		r.ParseForm()
 
