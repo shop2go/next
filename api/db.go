@@ -104,6 +104,8 @@ func DB(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprint(w, err)
 		}
 
+		fmt.Fprint(w, l)
+
 		m := make([]LOC, 0)
 
 		r.ParseForm()
