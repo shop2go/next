@@ -84,7 +84,7 @@ func DB(w http.ResponseWriter, r *http.Request) {
 	case "GET":
 
 		t := template.New("db")
-		t, _ = t.ParseFiles("/public/tmpl.html")
+		t, _ = t.ParseFiles("tmpl.html")
 		t.Execute(w, rvs)
 
 	}
