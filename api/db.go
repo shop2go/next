@@ -83,6 +83,17 @@ func DB(w http.ResponseWriter, r *http.Request) {
 
 	case "GET":
 
+		s := make([]string, 0)
+
+		for i := range rvs {
+
+			if _, ok := l[rvs[i].ID]; ok {
+
+				s = append(s, l[rvs[i].ID])
+
+			}
+		}
+
 		resp, err := http.Get("https://gist.githubusercontent.com/mmaedel/00dbb8cc7416c8afe7b0ce441bc48a17/raw/fa485917e733e8d02ae3659ab07feb0a92fee4a6/tmpl.html")
 		if err != nil {
 			fmt.Fprint(w, err)
@@ -95,7 +106,7 @@ func DB(w http.ResponseWriter, r *http.Request) {
 
 		t, err := template.New("db").Parse(string(body))
 
-		t.Execute(w, rvs)
+		t.Execute(w, s)
 
 	}
 
