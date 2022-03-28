@@ -109,13 +109,19 @@ func DB(w http.ResponseWriter, r *http.Request) {
 				<body style="background-color: #bcbcbc;">
 				<br>
 				<div class="container-sm" id="data" style="color:white; font-size:30px;">
-				<div class="input-group">
 				<form class="form-outline mb-4" method="POST">
 
-				<button type="submit" class="btn btn-outline-primary">search</button>
-				<input type="search" name="city" class="form-control rounded" placeholder="city or select country below" aria-label="Search" aria-describedby="search-addon" />
-				</form>
-				</div><br><br>
+				<div class="input-group">
+  <div class="form-outline">
+    <input type="search" id="city" name="city" class="form-control" />
+    <label class="form-label" for="city">search city or select country below</label>
+  </div>
+  <button type="submit" class="btn btn-primary">
+    <i class="fas fa-search"></i>
+  </button>
+</div>
+			</form>
+				<br><br>
 
 					   <ul class="list-group">
 	`
