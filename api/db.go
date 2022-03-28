@@ -8,12 +8,22 @@ import (
 	"net/http"
 	"os"
 	"sort"
+	"strings"
 	//"strconv"
 
 	//"time"
 
 	f "github.com/fauna/faunadb-go/v5/faunadb"
 )
+
+type LOC struct {
+	City        string `json:"Name",omitempty`
+	Country     string
+	CountryCODE string `json:"Country",omitempty`
+	CityCODE    string `json:"Location",omitempty`
+	SubDIV      string `json:"Subdivision",omitempty`
+	Coordinates string `json:"Coordinates",omitempty`
+}
 
 type DATA map[string]f.Value
 type rv f.RefV
@@ -73,13 +83,110 @@ func DB(w http.ResponseWriter, r *http.Request) {
 
 	//http.Redirect(w, r, "http://code2go.dev/data", http.StatusFound)
 
+	resp, err = http.Get("https://gist.githubusercontent.com/mmaedel/00dbb8cc7416c8afe7b0ce441bc48a17/raw/cbca25d2bf333bd580a140226524546531a019ab/tmpl.html")
+	if err != nil {
+		fmt.Fprint(w, err)
+	}
+	//We Read the response body on the line below.
+	body, err = ioutil.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Fprint(w, err)
+	}
+
 	switch r.Method {
 
 	case "POST":
 
+		resp, err := http.Get("https://raw.githubusercontent.com/ovrclk/un-locode/master/data/code-list_json.json")
+		if err != nil {
+			fmt.Fprint(w, err)
+		}
+		//We Read the response body on the line below.
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			fmt.Fprint(w, err)
+		}
+
+		var l, m []LOC
+
+		err = json.Unmarshal(body, &l)
+		if err != nil {
+			fmt.Fprint(w, err)
+		}
+
 		r.ParseForm()
 
-		fmt.Fprint(w, r.FormValue("city"))
+		d := strings.ToUpper(r.FormValue("data"))
+
+		for i := range l {
+
+			l[i].Country = countries[l[i].CountryCODE]
+
+			city := strings.ToUpper(l[i].City)
+
+			if city == d {
+
+				m = append(m, l[i])
+
+				continue
+
+			}
+
+			if strings.Contains(city, "/") {
+
+				n := strings.Split(city, "/")
+
+				for j := range n {
+					if n[j] == d {
+						m = append(m, l[i])
+						break
+					}
+				}
+
+				continue
+
+			}
+
+			if strings.Contains(city, "-") {
+
+				n := strings.Split(city, "-")
+
+				for j := range n {
+					if n[j] == d {
+						m = append(m, l[i])
+						break
+					}
+				}
+
+				continue
+
+			}
+
+			n := strings.Fields(city)
+
+			k := len(n)
+
+			if k > 1 {
+
+				for j := 0; j < k; j++ {
+
+					if n[j] == d {
+
+						m = append(m, l[i])
+
+						continue
+
+					}
+
+				}
+
+			}
+
+		}
+
+		t, err := template.New("db").Parse(string(body))
+
+		t.Execute(w, m)
 
 	case "GET":
 
@@ -92,16 +199,6 @@ func DB(w http.ResponseWriter, r *http.Request) {
 				s = append(s, l[rvs[i].ID])
 
 			}
-		}
-
-		resp, err := http.Get("https://gist.githubusercontent.com/mmaedel/00dbb8cc7416c8afe7b0ce441bc48a17/raw/cbca25d2bf333bd580a140226524546531a019ab/tmpl.html")
-		if err != nil {
-			fmt.Fprint(w, err)
-		}
-		//We Read the response body on the line below.
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			fmt.Fprint(w, err)
 		}
 
 		t, err := template.New("db").Parse(string(body))
