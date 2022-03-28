@@ -83,9 +83,19 @@ func DB(w http.ResponseWriter, r *http.Request) {
 
 	case "GET":
 
-		tmpl := template.Must(template.ParseFiles("https://gist.githubusercontent.com/mmaedel/00dbb8cc7416c8afe7b0ce441bc48a17/raw/fa485917e733e8d02ae3659ab07feb0a92fee4a6/tmpl.html"))
+		resp, err := http.Get("https://gist.githubusercontent.com/mmaedel/00dbb8cc7416c8afe7b0ce441bc48a17/raw/fa485917e733e8d02ae3659ab07feb0a92fee4a6/tmpl.html")
+		if err != nil {
+			fmt.Fprint(w, err)
+		}
+		//We Read the response body on the line below.
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			fmt.Fprint(w, err)
+		}
 
-		tmpl.Execute(w, rvs)
+		t, err := template.New("db").Parse(string(body))
+
+		t.Execute(w, rvs)
 
 	}
 
