@@ -183,6 +183,10 @@ func Data(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprint(w, err)
 		}
 
+		sort.SliceStable(m, func(i, j int) bool {
+			return m[i].Country < m[j].Country
+		})
+
 		t, err := template.New("db").Parse(string(body))
 		if err != nil {
 			fmt.Fprint(w, err)
