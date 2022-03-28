@@ -94,7 +94,7 @@ func DB(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		resp, err := http.Get("https://gist.githubusercontent.com/mmaedel/00dbb8cc7416c8afe7b0ce441bc48a17/raw/fa485917e733e8d02ae3659ab07feb0a92fee4a6/tmpl.html")
+		resp, err := http.Get("https://gist.githubusercontent.com/mmaedel/00dbb8cc7416c8afe7b0ce441bc48a17/raw/3565b1bcb1b94ef59c5c1781ea69e02a6d9a88bd/tmpl.html")
 		if err != nil {
 			fmt.Fprint(w, err)
 		}
