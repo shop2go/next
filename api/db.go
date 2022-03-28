@@ -17,12 +17,11 @@ import (
 )
 
 type LOC struct {
-	City        string `json:"Name",omitempty`
-	Country     string
-	CountryCODE string `json:"Country",omitempty`
-	CityCODE    string `json:"Location",omitempty`
-	SubDIV      string `json:"Subdivision",omitempty`
-	Coordinates string `json:"Coordinates",omitempty`
+	City        string `json:"Name"`
+	CountryCODE string `json:"Country"`
+	CityCODE    string `json:"Location"`
+	SubDIV      string `json:"Subdivision"`
+	Coordinates string `json:"Coordinates"`
 }
 
 type DATA map[string]f.Value
@@ -120,8 +119,6 @@ func DB(w http.ResponseWriter, r *http.Request) {
 
 		for i := range l {
 
-			l[i].Country = countries[l[i].CountryCODE]
-
 			city := strings.ToUpper(l[i].City)
 
 			if city == d {
@@ -185,6 +182,9 @@ func DB(w http.ResponseWriter, r *http.Request) {
 		}
 
 		t, err := template.New("db").Parse(string(body))
+		if err != nil {
+			fmt.Fprint(w, err)
+		}
 
 		t.Execute(w, m)
 
@@ -202,6 +202,9 @@ func DB(w http.ResponseWriter, r *http.Request) {
 		}
 
 		t, err := template.New("db").Parse(string(body))
+		if err != nil {
+			fmt.Fprint(w, err)
+		}
 
 		t.Execute(w, s)
 
