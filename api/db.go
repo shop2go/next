@@ -83,7 +83,7 @@ func DB(w http.ResponseWriter, r *http.Request) {
 
 	case "GET":
 
-		tmpl := template.Must(template.ParseFiles("public/tmpl.html"))
+		tmpl := template.Must(template.ParseFiles("../public/tmpl.html"))
 
 		tmpl.Execute(w, rvs)
 
