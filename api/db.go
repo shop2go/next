@@ -187,7 +187,7 @@ func Data(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if m == nil {
-			http.Redirect(w, r, "http://code2go.dev/api/db", http.StatusFound)
+			http.Redirect(w, r, "http://code2go.dev", http.StatusFound)
 		}
 
 		resp, err = http.Get("https://gist.githubusercontent.com/mmaedel/00dbb8cc7416c8afe7b0ce441bc48a17/raw/cf7dd67a8b6876e2a92a223b530aa39221501a08/tmpl2.gotmpl")
