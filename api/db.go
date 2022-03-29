@@ -101,7 +101,7 @@ func Data(w http.ResponseWriter, r *http.Request) {
 
 		r.ParseForm()
 
-		d := strings.ToUpper(r.FormValue("data"))
+		d := strings.ToUpper(strings.TrimSpace(r.FormValue("data")))
 
 		for i := range l {
 
@@ -139,6 +139,21 @@ func Data(w http.ResponseWriter, r *http.Request) {
 			if strings.Contains(city, "-") {
 
 				n := strings.Split(city, "-")
+
+				for j := range n {
+					if n[j] == d {
+						m = append(m, l[i])
+						break
+					}
+				}
+
+				continue
+
+			}
+
+			if strings.Contains(city, "(") {
+
+				n := strings.Split(strings.TrimSuffix(city, ")"), "(")
 
 				for j := range n {
 					if n[j] == d {
