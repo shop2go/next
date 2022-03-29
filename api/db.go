@@ -173,7 +173,7 @@ func Data(w http.ResponseWriter, r *http.Request) {
 
 		}
 
-		resp, err = http.Get("https://gist.githubusercontent.com/mmaedel/00dbb8cc7416c8afe7b0ce441bc48a17/raw/0bcb9bdbc3ed6c9d69961e619732faf745ba8d86/tmpl2.gotmpl")
+		resp, err = http.Get("https://gist.githubusercontent.com/mmaedel/00dbb8cc7416c8afe7b0ce441bc48a17/raw/7083f288cdc544ad0d9ac4c0577c1f5a3e37b8bb/tmpl2.gotmpl")
 		if err != nil {
 			fmt.Fprint(w, err)
 		}
