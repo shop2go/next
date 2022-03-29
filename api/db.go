@@ -186,48 +186,26 @@ func Data(w http.ResponseWriter, r *http.Request) {
 
 		}
 
-		if m != nil {
-
-			resp, err = http.Get("https://gist.githubusercontent.com/mmaedel/00dbb8cc7416c8afe7b0ce441bc48a17/raw/cf7dd67a8b6876e2a92a223b530aa39221501a08/tmpl2.gotmpl")
-			if err != nil {
-				fmt.Fprint(w, err)
-			}
-			//We Read the response body on the line below.
-			body, err = ioutil.ReadAll(resp.Body)
-			if err != nil {
-				fmt.Fprint(w, err)
-			}
-
-			sort.SliceStable(m, func(i, j int) bool {
-				return m[i].Country < m[j].Country
-			})
-
-			t, err := template.New("db").Parse(string(body))
-			if err != nil {
-				fmt.Fprint(w, err)
-			}
-
-			t.Execute(w, m)
-
-		} else {
-
-			resp, err = http.Get("https://gist.githubusercontent.com/mmaedel/00dbb8cc7416c8afe7b0ce441bc48a17/raw/cf7dd67a8b6876e2a92a223b530aa39221501a08/tmpl1.gotmpl")
-			if err != nil {
-				fmt.Fprint(w, err)
-			}
-			//We Read the response body on the line below.
-			body, err = ioutil.ReadAll(resp.Body)
-			if err != nil {
-				fmt.Fprint(w, err)
-			}
-
-			t, err := template.New("db").Parse(string(body))
-			if err != nil {
-				fmt.Fprint(w, err)
-			}
-
-			t.Execute(w, nil)
+		resp, err = http.Get("https://gist.githubusercontent.com/mmaedel/00dbb8cc7416c8afe7b0ce441bc48a17/raw/cf7dd67a8b6876e2a92a223b530aa39221501a08/tmpl2.gotmpl")
+		if err != nil {
+			fmt.Fprint(w, err)
 		}
+		//We Read the response body on the line below.
+		body, err = ioutil.ReadAll(resp.Body)
+		if err != nil {
+			fmt.Fprint(w, err)
+		}
+
+		sort.SliceStable(m, func(i, j int) bool {
+			return m[i].Country < m[j].Country
+		})
+
+		t, err := template.New("db").Parse(string(body))
+		if err != nil {
+			fmt.Fprint(w, err)
+		}
+
+		t.Execute(w, m)
 
 	case "GET":
 
