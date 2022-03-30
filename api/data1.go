@@ -26,50 +26,51 @@ type DATA map[string]f.Value
 type rv f.RefV
 
 type GIST struct {
-	Gist FILES `json:"files"`
+	Files FILES `json:"files"`
 }
 
 type FILES struct {
-	File RAW `json:"2.html"`
+	File1 RAW `json:"1.html"`
+	File2 RAW `json:"2.html"`
 }
 
 type RAW struct {
 	Raw string `json:"raw_url"`
 }
 
-func templ(id string) (string, error) {
+func templ(id string) (GIST, error) {
 
 	req, err := http.NewRequest("GET", "https://api.github.com/gists/"+id, nil)
 	if err != nil {
-		return "", err
+		return GIST{}, err
 	}
 
 	req.Header.Set("Accept", "application/vnd.github.v3+json")
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return "", err
+		return GIST{}, err
 	}
 
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return "", err
+		return GIST{}, err
 	}
 
 	var gist GIST
 
 	err = json.Unmarshal(body, &gist)
 	if err != nil {
-		return "", err
+		return GIST{}, err
 	}
 
-	return gist.Gist.File.Raw, nil
+	return gist, nil
 
 }
 
-func Data(w http.ResponseWriter, r *http.Request) {
+func Data1(w http.ResponseWriter, r *http.Request) {
 
 	var (
 		data DATA
@@ -230,12 +231,12 @@ func Data(w http.ResponseWriter, r *http.Request) {
 
 		}
 
-		url, err := templ("62bd80eaac41fb0251d87be53f804a4f")
+		gist, err := templ(os.Getenv("GIST_ID"))
 		if err != nil {
 			fmt.Fprint(w, err)
 		}
 
-		resp, err = http.Get(url)
+		resp, err = http.Get(gist.Files.File2.Raw)
 		if err != nil {
 			fmt.Fprint(w, err)
 		}
@@ -269,7 +270,12 @@ func Data(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		resp, err = http.Get("https://gist.githubusercontent.com/mmaedel/e7f0c7f12fbd734a3e1f241503cf6915/raw/04cab3906d19cfd448c18a5e5c0bd6c95773008c/1.html")
+		gist, err := templ(os.Getenv("GIST_ID"))
+		if err != nil {
+			fmt.Fprint(w, err)
+		}
+
+		resp, err = http.Get(gist.Files.File1.Raw)
 		if err != nil {
 			fmt.Fprint(w, err)
 		}
