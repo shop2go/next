@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"html/template"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"sort"
