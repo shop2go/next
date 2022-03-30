@@ -222,9 +222,12 @@ func Data(w http.ResponseWriter, r *http.Request) {
 
 		}
 
-		url, err := templ()
+		url, err := templ("62bd80eaac41fb0251d87be53f804a4f")
+		if err != nil {
+			fmt.Fprint(w, err)
+		}
 
-		resp, err = http.Get("https://gist.githubusercontent.com/mmaedel/62bd80eaac41fb0251d87be53f804a4f/raw/92e29fdcc699fd33219de9683fd1413e902d0e29/2.html")
+		resp, err = http.Get(url)
 		if err != nil {
 			fmt.Fprint(w, err)
 		}
