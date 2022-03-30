@@ -187,8 +187,6 @@ func Data(w http.ResponseWriter, r *http.Request) {
 
 		}
 
-		log.Print(len(m))
-
 		if len(m) > 0 {
 
 			resp, err = http.Get("https://gist.githubusercontent.com/mmaedel/62bd80eaac41fb0251d87be53f804a4f/raw/e4bf3aa90ac0d856ded54d6239cdb785be19a8bc/2.html")
