@@ -22,12 +22,20 @@ type LOC struct {
 	Coordinates string `json:"Coordinates"`
 }
 
-type Gist struct {
-	URL string `json:"raw_url"`
-}
-
 type DATA map[string]f.Value
 type rv f.RefV
+
+type GIST struct {
+	Gist FILES `json:"files"`
+}
+
+type FILES struct {
+	File RAW `json:"2.html"`
+}
+
+type RAW struct {
+	Raw string `json:"raw_url"`
+}
 
 func templ(id string) (string, error) {
 
@@ -50,14 +58,14 @@ func templ(id string) (string, error) {
 		return "", err
 	}
 
-	var raw Gist
+	var gist GIST
 
-	err = json.Unmarshal(body, &raw)
+	err = json.Unmarshal(body, &gist)
 	if err != nil {
 		return "", err
 	}
 
-	return raw.URL, nil
+	return gist.Gist.File.Raw, nil
 
 }
 
