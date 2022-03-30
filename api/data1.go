@@ -250,7 +250,7 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 			return m[i].Country < m[j].Country
 		})
 
-		t, err := template.New("db").Parse(string(body))
+		t, err := template.New("data").Parse(string(body))
 		if err != nil {
 			fmt.Fprint(w, err)
 		}
@@ -285,7 +285,7 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprint(w, err)
 		}
 
-		t, err := template.New("db").Parse(string(body))
+		t, err := template.New("data").Parse(string(body))
 		if err != nil {
 			fmt.Fprint(w, err)
 		}
