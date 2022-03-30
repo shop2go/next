@@ -22,8 +22,44 @@ type LOC struct {
 	Coordinates string `json:"Coordinates"`
 }
 
+type Gist struct {
+	URL string `json:"raw_url"`
+}
+
 type DATA map[string]f.Value
 type rv f.RefV
+
+func templ(id string) (string, error) {
+
+	req, err := http.NewRequest("GET", "https://api.github.com/gists/"+id, nil)
+	if err != nil {
+		return "", err
+	}
+
+	req.Header.Set("Accept", "application/vnd.github.v3+json")
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return "", err
+	}
+
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+
+	var raw Gist
+
+	err = json.Unmarshal(body, &raw)
+	if err != nil {
+		return "", err
+	}
+
+	return raw.URL, nil
+
+}
 
 func Data(w http.ResponseWriter, r *http.Request) {
 
@@ -186,11 +222,13 @@ func Data(w http.ResponseWriter, r *http.Request) {
 
 		}
 
+		url, err := templ()
+
 		resp, err = http.Get("https://gist.githubusercontent.com/mmaedel/62bd80eaac41fb0251d87be53f804a4f/raw/92e29fdcc699fd33219de9683fd1413e902d0e29/2.html")
 		if err != nil {
 			fmt.Fprint(w, err)
 		}
-		//We Read the response body on the line below.
+
 		body, err = ioutil.ReadAll(resp.Body)
 		if err != nil {
 			fmt.Fprint(w, err)
