@@ -89,13 +89,9 @@ func templ(id string) (GIST, error) {
 
 func Data1(w http.ResponseWriter, r *http.Request) {
 
-	id := r.URL.Hostname()
+	id := r.Host
 
-	id = id + r.URL.Path
-
-	id = strings.TrimSuffix(id, "code2go.dev/api/data1.go")
-
-	id = strings.TrimSuffix(id, ".")
+	//id = id + r.URL.Path
 
 	fmt.Fprint(w, "test: "+id)
 
