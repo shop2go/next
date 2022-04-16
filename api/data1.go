@@ -74,7 +74,7 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 
 	id := r.Host
 
-	id = strings.TrimSuffix(id, "code2go.dev/api/data.go")
+	id = strings.TrimSuffix(id, "code2go.dev/api/data1.go")
 
 	id = strings.TrimSuffix(id, ".")
 
