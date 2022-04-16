@@ -91,7 +91,7 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 
 	id := r.URL.Hostname()
 
-	id =
+	id = id + r.URL.Path
 
 	id = strings.TrimSuffix(id, "code2go.dev/api/data1.go")
 
