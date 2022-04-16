@@ -39,8 +39,6 @@ type LOCK struct {
 	Data g.String `graphql:"data"`
 }
 
-type LOCKS []LOCK
-
 type DATA map[string]f.Value
 type rv f.RefV
 
@@ -157,205 +155,201 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 
 	l := q.LOCKS.Data
 
-	if l != nil {
+	for _, v := range l {
+		fmt.Fprint(w, v.Link)
+	}
 
-		x, err = c.Query(f.Paginate(f.Databases()))
+	x, err = c.Query(f.Paginate(f.Databases()))
+	if err != nil {
+		fmt.Fprint(w, err)
+	}
+
+	if err = x.Get(&data); err != nil {
+		fmt.Fprint(w, err)
+	}
+
+	x = data["data"]
+
+	if err = x.Get(&rvs); err != nil {
+		fmt.Fprint(w, err)
+	}
+
+	sort.SliceStable(rvs, func(i, j int) bool {
+		return rvs[i].ID < rvs[j].ID
+	})
+
+	switch r.Method {
+
+	case "POST":
+
+		resp, err := http.Get("https://raw.githubusercontent.com/ovrclk/un-locode/master/data/code-list_json.json")
 		if err != nil {
 			fmt.Fprint(w, err)
 		}
 
-		if err = x.Get(&data); err != nil {
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
 			fmt.Fprint(w, err)
 		}
 
-		x = data["data"]
+		l := make([]LOC, 0)
 
-		if err = x.Get(&rvs); err != nil {
+		err = json.Unmarshal(body, &l)
+		if err != nil {
 			fmt.Fprint(w, err)
 		}
 
-		sort.SliceStable(rvs, func(i, j int) bool {
-			return rvs[i].ID < rvs[j].ID
+		m := make([]LOC, 0)
+
+		r.ParseForm()
+
+		d := strings.ToUpper(strings.TrimSpace(r.FormValue("data")))
+
+		for i := range l {
+
+			if v, ok := country[l[i].CountryCODE]; ok {
+
+				l[i].Country = v
+
+			}
+
+			city := strings.ToUpper(l[i].City)
+
+			if city == d {
+
+				m = append(m, l[i])
+
+				continue
+
+			}
+
+			if strings.Contains(city, "/") {
+
+				n := strings.Split(city, "/")
+
+				for j := range n {
+					if n[j] == d {
+						m = append(m, l[i])
+						break
+					}
+				}
+
+				continue
+
+			}
+
+			if strings.Contains(city, "-") {
+
+				n := strings.Split(city, "-")
+
+				for j := range n {
+					if n[j] == d {
+						m = append(m, l[i])
+						break
+					}
+				}
+
+				continue
+
+			}
+
+			if strings.Contains(city, "(") {
+
+				n := strings.Split(strings.TrimSuffix(city, ")"), "(")
+
+				for j := range n {
+					if n[j] == d {
+						m = append(m, l[i])
+						break
+					}
+				}
+
+				continue
+
+			}
+
+			n := strings.Fields(city)
+
+			k := len(n)
+
+			if k > 1 {
+
+				for j := 0; j < k; j++ {
+
+					if n[j] == d {
+
+						m = append(m, l[i])
+
+						continue
+
+					}
+
+				}
+
+			}
+
+		}
+
+		gist, err := templ(os.Getenv("GIST_ID"))
+		if err != nil {
+			fmt.Fprint(w, err)
+		}
+
+		resp, err = http.Get(gist.Files.File2.Raw)
+		if err != nil {
+			fmt.Fprint(w, err)
+		}
+
+		body, err = ioutil.ReadAll(resp.Body)
+		if err != nil {
+			fmt.Fprint(w, err)
+		}
+
+		sort.SliceStable(m, func(i, j int) bool {
+			return m[i].Country < m[j].Country
 		})
 
-		switch r.Method {
-
-		case "POST":
-
-			resp, err := http.Get("https://raw.githubusercontent.com/ovrclk/un-locode/master/data/code-list_json.json")
-			if err != nil {
-				fmt.Fprint(w, err)
-			}
-
-			body, err := ioutil.ReadAll(resp.Body)
-			if err != nil {
-				fmt.Fprint(w, err)
-			}
-
-			l := make([]LOC, 0)
-
-			err = json.Unmarshal(body, &l)
-			if err != nil {
-				fmt.Fprint(w, err)
-			}
-
-			m := make([]LOC, 0)
-
-			r.ParseForm()
-
-			d := strings.ToUpper(strings.TrimSpace(r.FormValue("data")))
-
-			for i := range l {
-
-				if v, ok := country[l[i].CountryCODE]; ok {
-
-					l[i].Country = v
-
-				}
-
-				city := strings.ToUpper(l[i].City)
-
-				if city == d {
-
-					m = append(m, l[i])
-
-					continue
-
-				}
-
-				if strings.Contains(city, "/") {
-
-					n := strings.Split(city, "/")
-
-					for j := range n {
-						if n[j] == d {
-							m = append(m, l[i])
-							break
-						}
-					}
-
-					continue
-
-				}
-
-				if strings.Contains(city, "-") {
-
-					n := strings.Split(city, "-")
-
-					for j := range n {
-						if n[j] == d {
-							m = append(m, l[i])
-							break
-						}
-					}
-
-					continue
-
-				}
-
-				if strings.Contains(city, "(") {
-
-					n := strings.Split(strings.TrimSuffix(city, ")"), "(")
-
-					for j := range n {
-						if n[j] == d {
-							m = append(m, l[i])
-							break
-						}
-					}
-
-					continue
-
-				}
-
-				n := strings.Fields(city)
-
-				k := len(n)
-
-				if k > 1 {
-
-					for j := 0; j < k; j++ {
-
-						if n[j] == d {
-
-							m = append(m, l[i])
-
-							continue
-
-						}
-
-					}
-
-				}
-
-			}
-
-			gist, err := templ(os.Getenv("GIST_ID"))
-			if err != nil {
-				fmt.Fprint(w, err)
-			}
-
-			resp, err = http.Get(gist.Files.File2.Raw)
-			if err != nil {
-				fmt.Fprint(w, err)
-			}
-
-			body, err = ioutil.ReadAll(resp.Body)
-			if err != nil {
-				fmt.Fprint(w, err)
-			}
-
-			sort.SliceStable(m, func(i, j int) bool {
-				return m[i].Country < m[j].Country
-			})
-
-			t, err := template.New("data").Parse(string(body))
-			if err != nil {
-				fmt.Fprint(w, err)
-			}
-
-			t.Execute(w, m)
-
-		case "GET":
-
-			s := make([]string, 0)
-
-			for i := range rvs {
-
-				if _, ok := country[rvs[i].ID]; ok {
-
-					s = append(s, country[rvs[i].ID])
-
-				}
-			}
-
-			gist, err := templ(os.Getenv("GIST_ID"))
-			if err != nil {
-				fmt.Fprint(w, err)
-			}
-
-			resp, err = http.Get(gist.Files.File1.Raw)
-			if err != nil {
-				fmt.Fprint(w, err)
-			}
-			//We Read the response body on the line below.
-			body, err = ioutil.ReadAll(resp.Body)
-			if err != nil {
-				fmt.Fprint(w, err)
-			}
-
-			t, err := template.New("data").Parse(string(body))
-			if err != nil {
-				fmt.Fprint(w, err)
-			}
-
-			t.Execute(w, s)
-
+		t, err := template.New("data").Parse(string(body))
+		if err != nil {
+			fmt.Fprint(w, err)
 		}
 
-	} else {
+		t.Execute(w, m)
 
-		http.Redirect(w, r, "https://code2go.dev", http.StatusSeeOther)
+	case "GET":
+
+		s := make([]string, 0)
+
+		for i := range rvs {
+
+			if _, ok := country[rvs[i].ID]; ok {
+
+				s = append(s, country[rvs[i].ID])
+
+			}
+		}
+
+		gist, err := templ(os.Getenv("GIST_ID"))
+		if err != nil {
+			fmt.Fprint(w, err)
+		}
+
+		resp, err = http.Get(gist.Files.File1.Raw)
+		if err != nil {
+			fmt.Fprint(w, err)
+		}
+		//We Read the response body on the line below.
+		body, err = ioutil.ReadAll(resp.Body)
+		if err != nil {
+			fmt.Fprint(w, err)
+		}
+
+		t, err := template.New("data").Parse(string(body))
+		if err != nil {
+			fmt.Fprint(w, err)
+		}
+
+		t.Execute(w, s)
 
 	}
 
