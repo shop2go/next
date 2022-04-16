@@ -278,8 +278,6 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprint(w, err)
 		}
 
-		t.Execute(w, id)
-
 		if id != "" {
 
 			x, err := c.Query(f.CreateKey(f.Obj{"database": f.Database("access"), "role": "admin"}))
@@ -354,9 +352,9 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 
 			for i := range rvs {
 
-				if _, ok := country[rvs[i].ID]; ok {
+				if v, ok := country[rvs[i].ID]; ok {
 
-					s = append(s, country[rvs[i].ID])
+					s = append(s, v)
 
 				}
 			}
