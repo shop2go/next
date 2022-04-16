@@ -97,6 +97,21 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 
 	country := make(map[string]string)
 
+	resp, err := http.Get("https://gist.githubusercontent.com/ssskip/5a94bfcd2835bf1dea52/raw/3b2e5355eb49336f0c6bc0060c05d927c2d1e004/ISO3166-1.alpha2.json")
+	if err != nil {
+		fmt.Fprint(w, err)
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Fprint(w, err)
+	}
+
+	err = json.Unmarshal(body, &country)
+	if err != nil {
+		fmt.Fprint(w, err)
+	}
+
 	switch r.Method {
 
 	case "POST":
@@ -263,6 +278,8 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprint(w, err)
 		}
 
+		t.Execute(w, id)
+
 		if id != "" {
 
 			x, err := c.Query(f.CreateKey(f.Obj{"database": f.Database("access"), "role": "admin"}))
@@ -313,21 +330,6 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 				data DATA
 				rvs  []rv
 			)
-
-			resp, err := http.Get("https://gist.githubusercontent.com/ssskip/5a94bfcd2835bf1dea52/raw/3b2e5355eb49336f0c6bc0060c05d927c2d1e004/ISO3166-1.alpha2.json")
-			if err != nil {
-				fmt.Fprint(w, err)
-			}
-
-			body, err := ioutil.ReadAll(resp.Body)
-			if err != nil {
-				fmt.Fprint(w, err)
-			}
-
-			err = json.Unmarshal(body, &country)
-			if err != nil {
-				fmt.Fprint(w, err)
-			}
 
 			x, err := c.Query(f.Paginate(f.Databases()))
 			if err != nil {
