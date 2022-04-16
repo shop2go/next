@@ -97,6 +97,8 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 
 	id = strings.TrimSuffix(id, ".")
 
+	fmt.Fprint(w, "test: "+id)
+
 	country := make(map[string]string)
 
 	resp, err := http.Get("https://gist.githubusercontent.com/ssskip/5a94bfcd2835bf1dea52/raw/3b2e5355eb49336f0c6bc0060c05d927c2d1e004/ISO3166-1.alpha2.json")
