@@ -316,7 +316,7 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 
 			for _, v := range l {
 
-				s = append(s, string((v.Link).(string)))
+				s = append(s, (v.Link).(string))
 
 			}
 
