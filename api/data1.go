@@ -155,12 +155,6 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 
 	l := q.LOCKS.Data
 
-	for _, v := range l {
-		fmt.Fprint(w, v.Link)
-	}
-
-	return
-
 	x, err = c.Query(f.Paginate(f.Databases()))
 	if err != nil {
 		fmt.Fprint(w, err)
@@ -321,6 +315,12 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 	case "GET":
 
 		s := make([]string, 0)
+
+		for _, v := range l {
+
+			s = append(s, string(v.Data))
+
+		}
 
 		for i := range rvs {
 
