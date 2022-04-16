@@ -159,6 +159,8 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, v.Link)
 	}
 
+	return
+
 	x, err = c.Query(f.Paginate(f.Databases()))
 	if err != nil {
 		fmt.Fprint(w, err)
