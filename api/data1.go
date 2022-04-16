@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"html/template"
@@ -10,8 +11,19 @@ import (
 	"sort"
 	"strings"
 
+	o "golang.org/x/oauth2"
+
 	f "github.com/fauna/faunadb-go/v5/faunadb"
+
+	g "github.com/shurcooL/graphql"
 )
+
+type ACCESS struct {
+	//Reference *f.RefV `fauna:"ref"`
+	Timestamp int    `fauna:"ts"`
+	Secret    string `fauna:"secret"`
+	Role      string `fauna:"role"`
+}
 
 type LOC struct {
 	City        string `json:"Name"`
@@ -21,6 +33,13 @@ type LOC struct {
 	SubDIV      string `json:"Subdivision"`
 	Coordinates string `json:"Coordinates"`
 }
+
+type LOCK struct {
+	Link g.ID     `graphql:"link"`
+	Data g.String `graphql:"data"`
+}
+
+type LOCKS []LOCK
 
 type DATA map[string]f.Value
 type rv f.RefV
@@ -78,37 +97,69 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 
 	id = strings.TrimSuffix(id, ".")
 
-	if id != "" {
+	var (
+		data DATA
+		rvs  []rv
+	)
 
-		var (
-			data DATA
-			rvs  []rv
-		)
+	resp, err := http.Get("https://gist.githubusercontent.com/ssskip/5a94bfcd2835bf1dea52/raw/3b2e5355eb49336f0c6bc0060c05d927c2d1e004/ISO3166-1.alpha2.json")
+	if err != nil {
+		fmt.Fprint(w, err)
+	}
 
-		resp, err := http.Get("https://gist.githubusercontent.com/ssskip/5a94bfcd2835bf1dea52/raw/3b2e5355eb49336f0c6bc0060c05d927c2d1e004/ISO3166-1.alpha2.json")
-		if err != nil {
-			fmt.Fprint(w, err)
-		}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Fprint(w, err)
+	}
 
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			fmt.Fprint(w, err)
-		}
+	country := make(map[string]string)
 
-		country := make(map[string]string)
+	err = json.Unmarshal(body, &country)
+	if err != nil {
+		fmt.Fprint(w, err)
+	}
 
-		err = json.Unmarshal(body, &country)
-		if err != nil {
-			fmt.Fprint(w, err)
-		}
+	ep := f.Endpoint("https://db.fauna.com:443")
 
-		ep := f.Endpoint("https://db.fauna.com:443")
+	fdb := os.Getenv("FAUNA_DB")
 
-		fdb := os.Getenv("FAUNA_DB")
+	c := f.NewFaunaClient(fdb, ep)
 
-		c := f.NewFaunaClient(fdb, ep)
+	x, err := c.Query(f.CreateKey(f.Obj{"database": f.Database("access"), "role": "admin"}))
+	if err != nil {
+		fmt.Fprint(w, err)
+	}
 
-		x, err := c.Query(f.Paginate(f.Databases()))
+	var acc ACCESS
+
+	x.Get(&acc)
+
+	src := o.StaticTokenSource(
+		&o.Token{AccessToken: acc.Secret},
+	)
+
+	httpClient := o.NewClient(context.Background(), src)
+
+	call := g.NewClient("https://graphql.fauna.com/graphql", httpClient)
+
+	var q struct {
+		LOCKS struct {
+			Data []LOCK
+		} `graphql:"locks(data: $data)"`
+	}
+	vars := map[string]interface{}{
+		"data": g.String(id),
+	}
+
+	if err := call.Query(context.Background(), &q, vars); err != nil {
+		fmt.Fprint(w, err)
+	}
+
+	l := q.LOCKS.Data
+
+	if l != nil {
+
+		x, err = c.Query(f.Paginate(f.Databases()))
 		if err != nil {
 			fmt.Fprint(w, err)
 		}
