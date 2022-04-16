@@ -91,9 +91,9 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 
 	id := r.Host
 
-	//id = id + r.URL.Path
+	id = strings.TrimSuffix(id, "code2go.dev")
 
-	fmt.Fprint(w, "test: "+id)
+	id = strings.TrimSuffix(id, ".")
 
 	country := make(map[string]string)
 
