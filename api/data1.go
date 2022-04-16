@@ -95,84 +95,7 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 
 	id = strings.TrimSuffix(id, ".")
 
-	var (
-		data DATA
-		rvs  []rv
-	)
-
-	resp, err := http.Get("https://gist.githubusercontent.com/ssskip/5a94bfcd2835bf1dea52/raw/3b2e5355eb49336f0c6bc0060c05d927c2d1e004/ISO3166-1.alpha2.json")
-	if err != nil {
-		fmt.Fprint(w, err)
-	}
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		fmt.Fprint(w, err)
-	}
-
 	country := make(map[string]string)
-
-	err = json.Unmarshal(body, &country)
-	if err != nil {
-		fmt.Fprint(w, err)
-	}
-
-	ep := f.Endpoint("https://db.fauna.com:443")
-
-	fdb := os.Getenv("FAUNA_DB")
-
-	c := f.NewFaunaClient(fdb, ep)
-
-	x, err := c.Query(f.CreateKey(f.Obj{"database": f.Database("access"), "role": "admin"}))
-	if err != nil {
-		fmt.Fprint(w, err)
-	}
-
-	var acc ACCESS
-
-	x.Get(&acc)
-
-	src := o.StaticTokenSource(
-		&o.Token{AccessToken: acc.Secret},
-	)
-
-	httpClient := o.NewClient(context.Background(), src)
-
-	call := g.NewClient("https://graphql.fauna.com/graphql", httpClient)
-
-	var q struct {
-		LOCKS struct {
-			Data []LOCK
-		} `graphql:"locks(data: $data)"`
-	}
-	vars := map[string]interface{}{
-		"data": g.String(id),
-	}
-
-	if err := call.Query(context.Background(), &q, vars); err != nil {
-		fmt.Fprint(w, err)
-	}
-
-	l := q.LOCKS.Data
-
-	x, err = c.Query(f.Paginate(f.Databases()))
-	if err != nil {
-		fmt.Fprint(w, err)
-	}
-
-	if err = x.Get(&data); err != nil {
-		fmt.Fprint(w, err)
-	}
-
-	x = data["data"]
-
-	if err = x.Get(&rvs); err != nil {
-		fmt.Fprint(w, err)
-	}
-
-	sort.SliceStable(rvs, func(i, j int) bool {
-		return rvs[i].ID < rvs[j].ID
-	})
 
 	switch r.Method {
 
@@ -314,34 +237,23 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 
 	case "GET":
 
-		s := make([]string, 0)
+		ep := f.Endpoint("https://db.fauna.com:443")
 
-		for _, v := range l {
+		fdb := os.Getenv("FAUNA_DB")
 
-			s = append(s, string(v.Data))
-
-		}
-
-		for i := range rvs {
-
-			if _, ok := country[rvs[i].ID]; ok {
-
-				s = append(s, country[rvs[i].ID])
-
-			}
-		}
+		c := f.NewFaunaClient(fdb, ep)
 
 		gist, err := templ(os.Getenv("GIST_ID"))
 		if err != nil {
 			fmt.Fprint(w, err)
 		}
 
-		resp, err = http.Get(gist.Files.File1.Raw)
+		resp, err := http.Get(gist.Files.File1.Raw)
 		if err != nil {
 			fmt.Fprint(w, err)
 		}
 		//We Read the response body on the line below.
-		body, err = ioutil.ReadAll(resp.Body)
+		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
 			fmt.Fprint(w, err)
 		}
@@ -351,7 +263,105 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprint(w, err)
 		}
 
-		t.Execute(w, s)
+		if id != "" {
+
+			x, err := c.Query(f.CreateKey(f.Obj{"database": f.Database("access"), "role": "admin"}))
+			if err != nil {
+				fmt.Fprint(w, err)
+			}
+
+			var acc ACCESS
+
+			x.Get(&acc)
+
+			src := o.StaticTokenSource(
+				&o.Token{AccessToken: acc.Secret},
+			)
+
+			httpClient := o.NewClient(context.Background(), src)
+
+			call := g.NewClient("https://graphql.fauna.com/graphql", httpClient)
+
+			var q struct {
+				LOCKS struct {
+					Data []LOCK
+				} `graphql:"locks(data: $data)"`
+			}
+			vars := map[string]interface{}{
+				"data": g.String(id),
+			}
+
+			if err := call.Query(context.Background(), &q, vars); err != nil {
+				fmt.Fprint(w, err)
+			}
+
+			l := q.LOCKS.Data
+
+			s := make([]string, 0)
+
+			for _, v := range l {
+
+				s = append(s, string(v.Data))
+
+			}
+
+			t.Execute(w, s)
+
+		} else {
+
+			var (
+				data DATA
+				rvs  []rv
+			)
+
+			resp, err := http.Get("https://gist.githubusercontent.com/ssskip/5a94bfcd2835bf1dea52/raw/3b2e5355eb49336f0c6bc0060c05d927c2d1e004/ISO3166-1.alpha2.json")
+			if err != nil {
+				fmt.Fprint(w, err)
+			}
+
+			body, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				fmt.Fprint(w, err)
+			}
+
+			err = json.Unmarshal(body, &country)
+			if err != nil {
+				fmt.Fprint(w, err)
+			}
+
+			x, err := c.Query(f.Paginate(f.Databases()))
+			if err != nil {
+				fmt.Fprint(w, err)
+			}
+
+			if err = x.Get(&data); err != nil {
+				fmt.Fprint(w, err)
+			}
+
+			x = data["data"]
+
+			if err = x.Get(&rvs); err != nil {
+				fmt.Fprint(w, err)
+			}
+
+			sort.SliceStable(rvs, func(i, j int) bool {
+				return rvs[i].ID < rvs[j].ID
+			})
+
+			s := make([]string, 0)
+
+			for i := range rvs {
+
+				if _, ok := country[rvs[i].ID]; ok {
+
+					s = append(s, country[rvs[i].ID])
+
+				}
+			}
+
+			t.Execute(w, s)
+
+		}
 
 	}
 
