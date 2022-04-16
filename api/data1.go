@@ -89,6 +89,11 @@ func templ(id string) (GIST, error) {
 
 func Data1(w http.ResponseWriter, r *http.Request) {
 
+	var (
+		data DATA
+		rvs  []rv
+	)
+
 	id := r.Host
 
 	id = strings.TrimSuffix(id, "code2go.dev")
@@ -320,14 +325,35 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 
 			}
 
+			d := f.NewFaunaClient(acc.Secret, ep)
+
+			x, err = d.Query(f.Paginate(f.Databases()))
+
+			if err = x.Get(&data); err != nil {
+				fmt.Fprint(w, err)
+			}
+
+			x = data["data"]
+
+			if err = x.Get(&rvs); err != nil {
+				fmt.Fprint(w, err)
+			}
+
+			sort.SliceStable(rvs, func(i, j int) bool {
+				return rvs[i].ID < rvs[j].ID
+			})
+
+			s = nil
+
+			for _, v := range rvs {
+
+				s = append(s, v.ID)
+
+			}
+
 			t.Execute(w, s)
 
 		} else {
-
-			var (
-				data DATA
-				rvs  []rv
-			)
 
 			x, err := c.Query(f.Paginate(f.Databases()))
 			if err != nil {
