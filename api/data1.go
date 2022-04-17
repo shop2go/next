@@ -335,17 +335,17 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 
 				x, err = d.Query(f.Paginate(f.Documents(f.ScopedCollection("LOCK", f.Database(strings.ToUpper(id)))), f.Size(100)))
 				if err != nil {
-					fmt.Print(err)
+					fmt.Fprint(w, err)
 				}
 
 				if err = x.Get(&data); err != nil {
-					fmt.Print(err)
+					fmt.Fprint(w, err)
 				}
 
 				x = data["data"]
 
 				if err = x.Get(&rvs); err != nil {
-					fmt.Print(err)
+					fmt.Fprint(w, err)
 				}
 
 				sort.SliceStable(rvs, func(i, j int) bool {
@@ -357,18 +357,20 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 					x, err = d.Query(f.Get(f.Ref(f.ScopedCollection("LOCK", f.Database(strings.ToUpper(id))), v.ID)))
 
 					if err = x.Get(&data); err != nil {
-						fmt.Print(err)
+						fmt.Fprint(w, err)
 					}
 
 					x = data["data"]
 
 					if err = x.Get(&data); err != nil {
-						fmt.Print(err)
+						fmt.Fprint(w, err)
 					}
 
 					x = data["data"]
 
-					s = append(s, fmt.Sprint(x))
+					z := fmt.Sprint(x)
+
+					s = append(s, string(z))
 
 				}
 
