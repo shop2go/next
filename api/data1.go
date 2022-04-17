@@ -333,26 +333,50 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 
 				d := f.NewFaunaClient(acc.Secret, ep)
 
-				x, err = d.Query(f.Paginate(f.Documents(f.ScopedCollection("LOCK", f.ScopedDatabase(strings.ToUpper(id)))), f.Size(100)))
+				x, err = d.Query(f.Paginate(f.Documents(f.ScopedCollection("LOCK", f.Database(strings.ToUpper(id)))), f.Size(100)))
 				if err != nil {
-					fmt.Fprint(w, err)
+					fmt.Print(err)
 				}
 
 				if err = x.Get(&data); err != nil {
-					fmt.Fprint(w, err)
+					fmt.Print(err)
 				}
 
 				x = data["data"]
 
 				if err = x.Get(&rvs); err != nil {
-					fmt.Fprint(w, err)
+					fmt.Print(err)
 				}
 
 				sort.SliceStable(rvs, func(i, j int) bool {
 					return rvs[i].ID < rvs[j].ID
 				})
 
-				t.Execute(w, rvs)
+				for _, v := range rvs {
+
+					x, err = d.Query(f.Get(f.Ref(f.ScopedCollection("LOCK", f.Database(strings.ToUpper(id))), v.ID)))
+
+					if err = x.Get(&data); err != nil {
+						fmt.Print(err)
+					}
+
+					x = data["data"]
+
+					if err = x.Get(&data); err != nil {
+						fmt.Print(err)
+					}
+
+					x = data["data"]
+
+					s = append(s, fmt.Sprint(x))
+
+				}
+
+				if s != nil {
+
+					t.Execute(w, s)
+
+				}
 
 			}
 
