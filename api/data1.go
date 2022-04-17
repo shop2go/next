@@ -331,9 +331,16 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 
 			} else {
 
+				x, err := c.Query(f.CreateKey(f.Obj{"database": f.Database(strings.ToUpper(id)), "role": "admin"}))
+				if err != nil {
+					fmt.Fprint(w, err)
+				}
+
+				x.Get(&acc)
+
 				d := f.NewFaunaClient(acc.Secret, ep)
 
-				x, err = d.Query(f.Paginate(f.Documents(f.ScopedCollection("LOCK", f.Database(strings.ToUpper(id)))), f.Size(300)))
+				x, err = d.Query(f.Paginate(f.Documents(f.Collection("GOT")), f.Size(300)))
 
 				if err = x.Get(&data); err != nil {
 					fmt.Fprint(w, err)
