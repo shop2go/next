@@ -116,7 +116,7 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 
 	case "POST":
 
-		resp, err := http.Get("https://raw.githubusercontent.com/ovrclk/un-locode/master/data/code-list_json.json")
+		resp, err = http.Get("https://raw.githubusercontent.com/ovrclk/un-locode/master/data/code-list_json.json")
 		if err != nil {
 			fmt.Fprint(w, err)
 		}
