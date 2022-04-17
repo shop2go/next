@@ -332,8 +332,8 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 			} else {
 
 				type lock struct {
-					Link string `fauna:"link"`
-					Data string `fauna:"data"`
+					Link string
+					Data string
 				}
 
 				d := f.NewFaunaClient(acc.Secret, ep)
@@ -369,17 +369,13 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 
 					x = data["data"]
 
-					x.Get(&l)
+					x.Get(&data)
 
 					s = append(s, l.Data)
 
 				}
 
-				if s != nil {
-
-					t.Execute(w, s)
-
-				}
+				t.Execute(w, s)
 
 			}
 
