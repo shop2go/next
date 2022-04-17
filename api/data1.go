@@ -331,6 +331,11 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 
 			} else {
 
+				type lock struct {
+					Link string `fauna:"link"`
+					Data string `fauna:"data"`
+				}
+
 				d := f.NewFaunaClient(acc.Secret, ep)
 
 				x, err = d.Query(f.Paginate(f.Documents(f.ScopedCollection("LOCK", f.Database(strings.ToUpper(id)))), f.Size(100)))
@@ -352,6 +357,8 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 					return rvs[i].ID < rvs[j].ID
 				})
 
+				var l lock
+
 				for _, v := range rvs {
 
 					x, err = d.Query(f.Get(f.Ref(f.ScopedCollection("LOCK", f.Database(strings.ToUpper(id))), v.ID)))
@@ -362,19 +369,9 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 
 					x = data["data"]
 
-					if err = x.Get(&data); err != nil {
-						fmt.Fprint(w, err)
-					}
+					x.Get(&l)
 
-					x = data["data"]
-
-					var z string
-
-					if err = x.Get(&z); err != nil {
-						fmt.Fprint(w, err)
-					}
-
-					s = append(s, z)
+					s = append(s, l.Data)
 
 				}
 
