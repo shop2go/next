@@ -368,7 +368,7 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 						} `graphql:"findLOCKByID(id: $id)"`
 					}
 					vars := map[string]interface{}{
-						"id": v.ID,
+						"id": g.ID(v.ID),
 					}
 
 					if err := call.Query(context.Background(), &q, vars); err != nil {
