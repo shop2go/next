@@ -352,30 +352,9 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 					return rvs[i].ID < rvs[j].ID
 				})
 
-				src := o.StaticTokenSource(
-					&o.Token{AccessToken: acc.Secret},
-				)
-
-				httpClient := o.NewClient(context.Background(), src)
-
-				call := g.NewClient("https://graphql.fauna.com/graphql", httpClient)
-
 				for _, v := range rvs {
 
-					var q struct {
-						LOCK struct {
-							Data LOCK
-						} `graphql:"findLOCKByID(id: $id)"`
-					}
-					vars := map[string]interface{}{
-						"id": g.ID(v.ID),
-					}
-
-					if err := call.Query(context.Background(), &q, vars); err != nil {
-						fmt.Fprint(w, err)
-					}
-
-					s = append(s, string(q.LOCK.Data.Data))
+					s = append(s, v.ID)
 
 				}
 
