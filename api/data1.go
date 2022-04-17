@@ -351,7 +351,11 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 
 				for _, v := range rvs {
 
-					s = append(s, v.ID)
+					if v.ID == id {
+
+						s = append(s, v.ID)
+
+					}
 
 				}
 
