@@ -368,9 +368,13 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 
 					x = data["data"]
 
-					z := fmt.Sprint(x)
+					var z string
 
-					s = append(s, string(z))
+					if err = x.Get(&z); err != nil {
+						fmt.Fprint(w, err)
+					}
+
+					s = append(s, z)
 
 				}
 
