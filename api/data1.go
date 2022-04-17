@@ -89,11 +89,6 @@ func templ(id string) (GIST, error) {
 
 func Data1(w http.ResponseWriter, r *http.Request) {
 
-	var (
-		data DATA
-		rvs  []rv
-	)
-
 	id := r.Host
 
 	id = strings.TrimSuffix(id, "code2go.dev")
@@ -126,7 +121,7 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprint(w, err)
 		}
 
-		body, err := ioutil.ReadAll(resp.Body)
+		body, err = ioutil.ReadAll(resp.Body)
 		if err != nil {
 			fmt.Fprint(w, err)
 		}
@@ -257,13 +252,10 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 
 	case "GET":
 
-		s := make([]string, 0)
-
-		ep := f.Endpoint("https://db.fauna.com:443")
-
-		fdb := os.Getenv("FAUNA_DB")
-
-		c := f.NewFaunaClient(fdb, ep)
+		var (
+			data DATA
+			rvs  []rv
+		)
 
 		gist, err := templ(os.Getenv("GIST_ID"))
 		if err != nil {
@@ -285,14 +277,22 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprint(w, err)
 		}
 
-		var acc ACCESS
+		ep := f.Endpoint("https://db.fauna.com:443")
+
+		fdb := os.Getenv("FAUNA_DB")
+
+		c := f.NewFaunaClient(fdb, ep)
 
 		x, err := c.Query(f.CreateKey(f.Obj{"database": f.Database("access"), "role": "admin"}))
 		if err != nil {
 			fmt.Fprint(w, err)
 		}
 
+		var acc ACCESS
+
 		x.Get(&acc)
+
+		s := make([]string, 0)
 
 		if id != "" {
 
@@ -331,9 +331,9 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 
 			} else {
 
-				d := f.NewFaunaClient(acc.Secret, ep)
+				//d := f.NewFaunaClient(acc.Secret, ep)
 
-				x, err = d.Query(f.Paginate(f.Databases()))
+				x, err = c.Query(f.Paginate(f.Databases()))
 
 				if err = x.Get(&data); err != nil {
 					fmt.Fprint(w, err)
@@ -361,7 +361,8 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 
 				} else {
 
-					http.Redirect(w, r, id+"code2go.dev", http.StatusSeeOther)
+					http.Redirect(w, r, id+".code2go.dev", http.StatusSeeOther)
+
 				}
 
 			}
