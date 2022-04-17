@@ -365,10 +365,10 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 					var q struct {
 						LOCK struct {
 							Data LOCK
-						} `graphql:"locks(id: $id)"`
+						} `graphql:"findLOCKByID(id: $id)"`
 					}
 					vars := map[string]interface{}{
-						"id": g.ID(v.ID),
+						"id": v.ID,
 					}
 
 					if err := call.Query(context.Background(), &q, vars); err != nil {
