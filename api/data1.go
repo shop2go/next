@@ -352,15 +352,7 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 					return rvs[i].ID < rvs[j].ID
 				})
 
-				if s != nil {
-
-					t.Execute(w, rvs)
-
-				} else {
-
-					http.Redirect(w, r, id+".code2go.dev", http.StatusSeeOther)
-
-				}
+				t.Execute(w, rvs)
 
 			}
 
