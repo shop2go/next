@@ -352,15 +352,9 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 					return rvs[i].ID < rvs[j].ID
 				})
 
-				for _, v := range rvs {
-
-					s = append(s, string(v.ID))
-
-				}
-
 				if s != nil {
 
-					t.Execute(w, s)
+					t.Execute(w, rvs)
 
 				} else {
 
