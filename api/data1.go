@@ -287,14 +287,14 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 
 		var acc ACCESS
 
+		x, err := c.Query(f.CreateKey(f.Obj{"database": f.Database("access"), "role": "admin"}))
+		if err != nil {
+			fmt.Fprint(w, err)
+		}
+
+		x.Get(&acc)
+
 		if id != "" {
-
-			x, err := c.Query(f.CreateKey(f.Obj{"database": f.Database("access"), "role": "admin"}))
-			if err != nil {
-				fmt.Fprint(w, err)
-			}
-
-			x.Get(&acc)
 
 			src := o.StaticTokenSource(
 				&o.Token{AccessToken: acc.Secret},
@@ -355,7 +355,14 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 
 				}
 
-				t.Execute(w, s)
+				if s != nil {
+
+					t.Execute(w, s)
+
+				} else {
+
+					http.Redirect(w, r, id+"code2go.dev", http.StatusSeeOther)
+				}
 
 			}
 
