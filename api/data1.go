@@ -257,6 +257,8 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 
 	case "GET":
 
+		s := make([]string, 0)
+
 		ep := f.Endpoint("https://db.fauna.com:443")
 
 		fdb := os.Getenv("FAUNA_DB")
@@ -283,14 +285,14 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprint(w, err)
 		}
 
+		var acc ACCESS
+
 		if id != "" {
 
 			x, err := c.Query(f.CreateKey(f.Obj{"database": f.Database("access"), "role": "admin"}))
 			if err != nil {
 				fmt.Fprint(w, err)
 			}
-
-			var acc ACCESS
 
 			x.Get(&acc)
 
@@ -317,41 +319,45 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 
 			l := q.LOCKS.Data
 
-			s := make([]string, 0)
+			if l != nil {
 
-			for _, v := range l {
+				for _, v := range l {
 
-				s = append(s, (v.Link).(string))
+					s = append(s, (v.Link).(string))
+
+				}
+
+				t.Execute(w, s)
+
+			} else {
+
+				d := f.NewFaunaClient(acc.Secret, ep)
+
+				x, err = d.Query(f.Paginate(f.Databases()))
+
+				if err = x.Get(&data); err != nil {
+					fmt.Fprint(w, err)
+				}
+
+				x = data["data"]
+
+				if err = x.Get(&rvs); err != nil {
+					fmt.Fprint(w, err)
+				}
+
+				sort.SliceStable(rvs, func(i, j int) bool {
+					return rvs[i].ID < rvs[j].ID
+				})
+
+				for _, v := range rvs {
+
+					s = append(s, v.ID)
+
+				}
+
+				t.Execute(w, s)
 
 			}
-
-			d := f.NewFaunaClient(acc.Secret, ep)
-
-			x, err = d.Query(f.Paginate(f.Databases()))
-
-			if err = x.Get(&data); err != nil {
-				fmt.Fprint(w, err)
-			}
-
-			x = data["data"]
-
-			if err = x.Get(&rvs); err != nil {
-				fmt.Fprint(w, err)
-			}
-
-			sort.SliceStable(rvs, func(i, j int) bool {
-				return rvs[i].ID < rvs[j].ID
-			})
-
-			s = nil
-
-			for _, v := range rvs {
-
-				s = append(s, v.ID)
-
-			}
-
-			t.Execute(w, s)
 
 		} else {
 
