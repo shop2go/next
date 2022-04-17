@@ -1,7 +1,7 @@
 package handler
 
 import (
-	//"context"
+	"context"
 	"encoding/json"
 	"fmt"
 	"html/template"
@@ -11,7 +11,7 @@ import (
 	"sort"
 	"strings"
 
-	//o "golang.org/x/oauth2"
+	o "golang.org/x/oauth2"
 
 	f "github.com/fauna/faunadb-go/v5/faunadb"
 
@@ -95,164 +95,161 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 
 	id = strings.TrimSuffix(id, ".")
 
-	//country := make(map[string]string)
+	country := make(map[string]string)
 
-	/*
-		resp, err := http.Get("https://gist.githubusercontent.com/ssskip/5a94bfcd2835bf1dea52/raw/3b2e5355eb49336f0c6bc0060c05d927c2d1e004/ISO3166-1.alpha2.json")
-		if err != nil {
-			fmt.Fprint(w, err)
-		}
+	resp, err := http.Get("https://gist.githubusercontent.com/ssskip/5a94bfcd2835bf1dea52/raw/3b2e5355eb49336f0c6bc0060c05d927c2d1e004/ISO3166-1.alpha2.json")
+	if err != nil {
+		fmt.Fprint(w, err)
+	}
 
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			fmt.Fprint(w, err)
-		}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Fprint(w, err)
+	}
 
-		err = json.Unmarshal(body, &country)
-		if err != nil {
-			fmt.Fprint(w, err)
-		}
-
-	*/
+	err = json.Unmarshal(body, &country)
+	if err != nil {
+		fmt.Fprint(w, err)
+	}
 
 	switch r.Method {
 
 	case "POST":
-		/*
-			resp, err = http.Get("https://raw.githubusercontent.com/ovrclk/un-locode/master/data/code-list_json.json")
-			if err != nil {
-				fmt.Fprint(w, err)
+
+		resp, err = http.Get("https://raw.githubusercontent.com/ovrclk/un-locode/master/data/code-list_json.json")
+		if err != nil {
+			fmt.Fprint(w, err)
+		}
+
+		body, err = ioutil.ReadAll(resp.Body)
+		if err != nil {
+			fmt.Fprint(w, err)
+		}
+
+		l := make([]LOC, 0)
+
+		err = json.Unmarshal(body, &l)
+		if err != nil {
+			fmt.Fprint(w, err)
+		}
+
+		m := make([]LOC, 0)
+
+		r.ParseForm()
+
+		d := strings.ToUpper(strings.TrimSpace(r.FormValue("data")))
+
+		for i := range l {
+
+			if v, ok := country[l[i].CountryCODE]; ok {
+
+				l[i].Country = v
+
 			}
 
-			body, err = ioutil.ReadAll(resp.Body)
-			if err != nil {
-				fmt.Fprint(w, err)
+			city := strings.ToUpper(l[i].City)
+
+			if city == d {
+
+				m = append(m, l[i])
+
+				continue
+
 			}
 
-			l := make([]LOC, 0)
+			if strings.Contains(city, "/") {
 
-			err = json.Unmarshal(body, &l)
-			if err != nil {
-				fmt.Fprint(w, err)
-			}
+				n := strings.Split(city, "/")
 
-			m := make([]LOC, 0)
-
-			r.ParseForm()
-
-			d := strings.ToUpper(strings.TrimSpace(r.FormValue("data")))
-
-			for i := range l {
-
-				if v, ok := country[l[i].CountryCODE]; ok {
-
-					l[i].Country = v
-
+				for j := range n {
+					if n[j] == d {
+						m = append(m, l[i])
+						break
+					}
 				}
 
-				city := strings.ToUpper(l[i].City)
+				continue
 
-				if city == d {
+			}
 
-					m = append(m, l[i])
+			if strings.Contains(city, "-") {
 
-					continue
+				n := strings.Split(city, "-")
 
+				for j := range n {
+					if n[j] == d {
+						m = append(m, l[i])
+						break
+					}
 				}
 
-				if strings.Contains(city, "/") {
+				continue
 
-					n := strings.Split(city, "/")
+			}
 
-					for j := range n {
-						if n[j] == d {
-							m = append(m, l[i])
-							break
-						}
+			if strings.Contains(city, "(") {
+
+				n := strings.Split(strings.TrimSuffix(city, ")"), "(")
+
+				for j := range n {
+					if n[j] == d {
+						m = append(m, l[i])
+						break
+					}
+				}
+
+				continue
+
+			}
+
+			n := strings.Fields(city)
+
+			k := len(n)
+
+			if k > 1 {
+
+				for j := 0; j < k; j++ {
+
+					if n[j] == d {
+
+						m = append(m, l[i])
+
+						continue
+
 					}
 
-					continue
-
-				}
-
-				if strings.Contains(city, "-") {
-
-					n := strings.Split(city, "-")
-
-					for j := range n {
-						if n[j] == d {
-							m = append(m, l[i])
-							break
-						}
-					}
-
-					continue
-
-				}
-
-				if strings.Contains(city, "(") {
-
-					n := strings.Split(strings.TrimSuffix(city, ")"), "(")
-
-					for j := range n {
-						if n[j] == d {
-							m = append(m, l[i])
-							break
-						}
-					}
-
-					continue
-
-				}
-
-				n := strings.Fields(city)
-
-				k := len(n)
-
-				if k > 1 {
-
-					for j := 0; j < k; j++ {
-
-						if n[j] == d {
-
-							m = append(m, l[i])
-
-							continue
-
-						}
-
-					}
-
 				}
 
 			}
 
-			gist, err := templ(os.Getenv("GIST_ID"))
-			if err != nil {
-				fmt.Fprint(w, err)
-			}
+		}
 
-			resp, err = http.Get(gist.Files.File2.Raw)
-			if err != nil {
-				fmt.Fprint(w, err)
-			}
+		gist, err := templ(os.Getenv("GIST_ID"))
+		if err != nil {
+			fmt.Fprint(w, err)
+		}
 
-			body, err = ioutil.ReadAll(resp.Body)
-			if err != nil {
-				fmt.Fprint(w, err)
-			}
+		resp, err = http.Get(gist.Files.File2.Raw)
+		if err != nil {
+			fmt.Fprint(w, err)
+		}
 
-			sort.SliceStable(m, func(i, j int) bool {
-				return m[i].Country < m[j].Country
-			})
+		body, err = ioutil.ReadAll(resp.Body)
+		if err != nil {
+			fmt.Fprint(w, err)
+		}
 
-			t, err := template.New("data").Parse(string(body))
-			if err != nil {
-				fmt.Fprint(w, err)
-			}
+		sort.SliceStable(m, func(i, j int) bool {
+			return m[i].Country < m[j].Country
+		})
 
-			t.Execute(w, m)
-		*/
+		t, err := template.New("data").Parse(string(body))
+		if err != nil {
+			fmt.Fprint(w, err)
+		}
+
+		t.Execute(w, m)
+
 	case "GET":
 
 		var (
@@ -296,94 +293,53 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 		x.Get(&acc)
 
 		s := make([]string, 0)
-		/*
-			if id != "" {
 
-				src := o.StaticTokenSource(
-					&o.Token{AccessToken: acc.Secret},
-				)
+		if id != "" {
 
-				httpClient := o.NewClient(context.Background(), src)
+			src := o.StaticTokenSource(
+				&o.Token{AccessToken: acc.Secret},
+			)
 
-				call := g.NewClient("https://graphql.fauna.com/graphql", httpClient)
+			httpClient := o.NewClient(context.Background(), src)
 
-				var q struct {
-					LOCKS struct {
-						Data []LOCK
-					} `graphql:"locks(data: $data)"`
+			call := g.NewClient("https://graphql.fauna.com/graphql", httpClient)
+
+			var q struct {
+				LOCKS struct {
+					Data []LOCK
+				} `graphql:"locks(data: $data)"`
+			}
+			vars := map[string]interface{}{
+				"data": g.String(id),
+			}
+
+			if err := call.Query(context.Background(), &q, vars); err != nil {
+				fmt.Fprint(w, err)
+			}
+
+			l := q.LOCKS.Data
+
+			if l != nil {
+
+				for _, v := range l {
+
+					s = append(s, (v.Link).(string))
+
 				}
-				vars := map[string]interface{}{
-					"data": g.String(id),
-				}
 
-				if err := call.Query(context.Background(), &q, vars); err != nil {
-					fmt.Fprint(w, err)
-				}
+				t.Execute(w, s)
 
-				l := q.LOCKS.Data
-
-				if l != nil {
-
-					for _, v := range l {
-
-						s = append(s, (v.Link).(string))
-
-					}
-
-					t.Execute(w, s)
-
-				} else {
-		*/
-
-		d := f.NewFaunaClient(acc.Secret, ep)
-
-		x, err = d.Query(f.Paginate(f.Documents(f.ScopedCollection("GOT", f.Database(strings.ToUpper(id)))), f.Size(300)))
-		if err != nil {
-			fmt.Fprint(w, err)
-		}
-
-		if err = x.Get(&data); err != nil {
-			fmt.Fprint(w, err)
-		}
-
-		x = data["data"]
-
-		if err = x.Get(&rvs); err != nil {
-			fmt.Fprint(w, err)
-		}
-
-		sort.SliceStable(rvs, func(i, j int) bool {
-			return rvs[i].ID < rvs[j].ID
-		})
-
-		for _, v := range rvs {
-
-			s = append(s, v.ID)
-
-		}
-
-		if s != nil {
-
-			t.Execute(w, s)
-
-		} else {
-
-			http.Redirect(w, r, id+".code2go.dev", http.StatusSeeOther)
-
-		}
-
-	}
-	/*
 			} else {
 
-				x, err := c.Query(f.Paginate(f.Databases()))
+				d := f.NewFaunaClient(acc.Secret, ep)
+
+				x, err = d.Query(f.Paginate(f.Documents(f.ScopedCollection("LOCK", f.Database(strings.ToUpper(id)))), f.Size(100)))
 				if err != nil {
 					fmt.Fprint(w, err)
 				}
 
 				if err = x.Get(&data); err != nil {
 					fmt.Fprint(w, err)
-
 				}
 
 				x = data["data"]
@@ -396,21 +352,82 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 					return rvs[i].ID < rvs[j].ID
 				})
 
-				s := make([]string, 0)
+				src := o.StaticTokenSource(
+					&o.Token{AccessToken: acc.Secret},
+				)
 
-				for i := range rvs {
+				httpClient := o.NewClient(context.Background(), src)
 
-					if v, ok := country[rvs[i].ID]; ok {
+				call := g.NewClient("https://graphql.fauna.com/graphql", httpClient)
 
-						s = append(s, v)
+				for _, v := range rvs {
 
+					var q struct {
+						LOCK struct {
+							Data LOCK
+						} `graphql:"locks(id: $id)"`
 					}
+					vars := map[string]interface{}{
+						"id": g.ID(v.ID),
+					}
+
+					if err := call.Query(context.Background(), &q, vars); err != nil {
+						fmt.Fprint(w, err)
+					}
+
+					s = append(s, string(q.LOCK.Data.Data))
+
 				}
 
-				t.Execute(w, s)
+				if s != nil {
+
+					t.Execute(w, s)
+
+				} else {
+
+					http.Redirect(w, r, id+".code2go.dev", http.StatusSeeOther)
+
+				}
 
 			}
 
+		} else {
+
+			x, err := c.Query(f.Paginate(f.Databases()))
+			if err != nil {
+				fmt.Fprint(w, err)
+			}
+
+			if err = x.Get(&data); err != nil {
+				fmt.Fprint(w, err)
+
+			}
+
+			x = data["data"]
+
+			if err = x.Get(&rvs); err != nil {
+				fmt.Fprint(w, err)
+			}
+
+			sort.SliceStable(rvs, func(i, j int) bool {
+				return rvs[i].ID < rvs[j].ID
+			})
+
+			s := make([]string, 0)
+
+			for i := range rvs {
+
+				if v, ok := country[rvs[i].ID]; ok {
+
+					s = append(s, v)
+
+				}
+			}
+
+			t.Execute(w, s)
+
 		}
-	*/
+
+	}
+
 }
