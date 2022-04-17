@@ -369,7 +369,7 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 
 					x = data["data"]
 
-					x.Get(&data)
+					x.Get(&l)
 
 					s = append(s, l.Data)
 
