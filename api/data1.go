@@ -412,7 +412,7 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 				}
 			}
 
-			t.Execute(w, nil)
+			t.Execute(w, s)
 
 		}
 
