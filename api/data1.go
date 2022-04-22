@@ -331,7 +331,7 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 
 			} else {
 
-				type lock struct {
+				type Dat struct {
 					Link string `fauna:"link"`
 					Data string `fauna:"data"`
 				}
@@ -357,21 +357,24 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 					return rvs[i].ID < rvs[j].ID
 				})
 
-				var l lock
+				var dat Dat
 
 				for _, v := range rvs {
 
-					x, err := d.Query(f.Get(f.Ref(v.ID)))
+					x, err := d.Query(f.Get(f.Ref(f.ScopedCollection("LOCK", f.Database(strings.ToUpper((id)))), v.ID)))
+					if err != nil {
+						fmt.Print(err)
+					}
 
 					if err = x.Get(&data); err != nil {
-						fmt.Fprint(w, err)
+						fmt.Print(err)
 					}
 
 					x = data["data"]
 
-					x.Get(&l)
+					x.Get(&dat)
 
-					s = append(s, l.Data)
+					s = append(s, dat.Data)
 
 				}
 
