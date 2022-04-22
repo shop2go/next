@@ -332,13 +332,13 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 			} else {
 
 				type lock struct {
-					Link string
-					Data string
+					Link string `fauna:"link"`
+					Data string `fauna:"data"`
 				}
 
 				d := f.NewFaunaClient(acc.Secret, ep)
 
-				x, err = d.Query(f.Paginate(f.Documents(f.ScopedCollection("LOCK", f.Database(strings.ToUpper(id)))), f.Size(100)))
+				x, err = d.Query(f.Paginate(f.Documents(f.ScopedCollection("LOCK"), f.Database(strings.ToUpper(id)))), f.Size(100)))
 				if err != nil {
 					fmt.Fprint(w, err)
 				}
