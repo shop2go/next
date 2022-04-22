@@ -361,7 +361,7 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 
 				for _, v := range rvs {
 
-					x, err = d.Query(f.Get(f.Ref(f.ScopedCollection("LOCK", f.Database(strings.ToUpper(id))), v.ID)))
+					x, err := d.Query(f.Get(f.Ref(f.ScopedCollection("LOCK", f.Database(strings.ToUpper(id))), v.ID)))
 
 					if err = x.Get(&data); err != nil {
 						fmt.Fprint(w, err)
