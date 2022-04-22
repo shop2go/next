@@ -338,7 +338,7 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 
 				d := f.NewFaunaClient(acc.Secret, ep)
 
-				x, err := d.Query(f.Paginate(f.Documents(f.ScopedCollection("LOCK", f.Database(strings.ToUpper(id)))), f.Size(100)))
+				x, err := d.Query(f.Paginate(f.Documents(f.ScopedCollection("LOCK", f.Database(strings.ToUpper(id)))), f.Size(30)))
 				if err != nil {
 					fmt.Fprint(w, err)
 				}
@@ -361,7 +361,7 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 
 				for _, v := range rvs {
 
-					x, err := d.Query(f.Get(f.Ref(f.ScopedCollection("LOCK", f.Database(strings.ToUpper(id))), v.ID)))
+					x, err := d.Query(f.Get(f.Ref(v.ID)))
 
 					if err = x.Get(&data); err != nil {
 						fmt.Fprint(w, err)
