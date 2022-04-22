@@ -331,11 +331,6 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 
 			} else {
 
-				type Dat struct {
-					Link string `fauna:"link"`
-					Data string `fauna:"data"`
-				}
-
 				d := f.NewFaunaClient(acc.Secret, ep)
 
 				x, err := d.Query(f.Paginate(f.Documents(f.ScopedCollection("LOCK", f.Database(strings.ToUpper(id)))), f.Size(30)))
@@ -357,24 +352,23 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 					return rvs[i].ID < rvs[j].ID
 				})
 
-				var dat Dat
-
 				for _, v := range rvs {
 
-					x, err := d.Query(f.Get(f.Ref(f.ScopedCollection("LOCK", f.Database(strings.ToUpper((id)))), v.ID)))
-					if err != nil {
-						fmt.Print(err)
+					var q struct {
+						findLOCKByID struct {
+							LOCK
+						} `graphql:"findLOCKByID(id: $id)"`
 					}
 
-					if err = x.Get(&data); err != nil {
-						fmt.Print(err)
+					vars := map[string]interface{}{
+						"id": g.String(v.ID),
 					}
 
-					x = data["data"]
+					if err := call.Query(context.Background(), &q, vars); err != nil {
+						fmt.Fprint(w, err)
+					}
 
-					x.Get(&dat)
-
-					s = append(s, dat.Data)
+					s = append(s, string(q.findLOCKByID.Data))
 
 				}
 
