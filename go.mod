@@ -1,6 +1,6 @@
 module github.com/next
 
-go 1.17
+go 1.20
 
 require (
 	github.com/fauna/faunadb-go/v5 v5.0.0-beta
