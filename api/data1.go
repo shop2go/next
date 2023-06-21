@@ -89,6 +89,8 @@ func templ(id string) (GIST, error) {
 
 func Data1(w http.ResponseWriter, r *http.Request) {
 
+	fmt.Fprint(w, r.Header.Get("x-vercel-ip-country"))
+
 	id := r.Host
 
 	id = strings.TrimSuffix(id, "code2go.dev")
