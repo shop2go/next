@@ -268,7 +268,7 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			fmt.Fprint(w, err)
 		}
-		//We Read the response body on the line below.
+
 		body, err := io.ReadAll(resp.Body)
 		if err != nil {
 			fmt.Fprint(w, err)
