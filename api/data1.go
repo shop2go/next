@@ -91,7 +91,7 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 
 	id := r.Header.Get("x-vercel-ip-country")
 
-	fmt.Fprint(w, r.Header.Get("x-vercel-ip-city"))
+	fmt.Fprint(w, r.Header)
 
 	country := make(map[string]string)
 
