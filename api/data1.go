@@ -121,7 +121,7 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprint(w, err)
 		}
 
-		body, err = ioutil.ReadAll(resp.Body)
+		body, err = io.ReadAll(resp.Body)
 		if err != nil {
 			fmt.Fprint(w, err)
 		}
@@ -234,7 +234,7 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprint(w, err)
 		}
 
-		body, err = ioutil.ReadAll(resp.Body)
+		body, err = io.ReadAll(resp.Body)
 		if err != nil {
 			fmt.Fprint(w, err)
 		}
@@ -267,7 +267,7 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprint(w, err)
 		}
 		//We Read the response body on the line below.
-		body, err := ioutil.ReadAll(resp.Body)
+		body, err := io.ReadAll(resp.Body)
 		if err != nil {
 			fmt.Fprint(w, err)
 		}

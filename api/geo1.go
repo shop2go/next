@@ -1,11 +1,12 @@
 package geo
 
 import (
+	"fmt"
 	"io"
 	"net/http"
 )
 
-func geo(w http.ResponseWriter, r *http.Request) {
+func Geo1(w http.ResponseWriter, r *http.Request) {
 
 	resp, err := http.Get("https://vercel-geoip.vercel.app")
 	if err != nil {
