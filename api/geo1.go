@@ -13,11 +13,13 @@ func Geo1(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, err)
 	}
 
+	defer resp.Body.Close()
+
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		fmt.Fprint(w, err)
 	}
 
-	fmt.Fprint(w, body)
+	fmt.Fprint(w, string(body))
 
 }
