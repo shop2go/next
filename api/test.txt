@@ -1,0 +1,107 @@
+package main
+
+import (
+	//"context"
+	//"encoding/json"
+	"fmt"
+	//"io/ioutil"
+	//"net/http"
+	"sort"
+	"strings"
+
+	//o "golang.org/x/oauth2"
+
+	f "github.com/fauna/faunadb-go/v5/faunadb"
+	//g "github.com/shurcooL/graphql"
+)
+
+type ACCESS struct {
+	Reference *f.RefV `fauna:"ref"`
+	Timestamp int     `fauna:"ts"`
+	Secret    string  `fauna:"secret"`
+	Role      string  `fauna:"role"`
+}
+
+type LOC struct {
+	City        string `json:"Name"`
+	Country     string
+	CountryCODE string `json:"Country"`
+	CityCODE    string `json:"Location"`
+	SubDIV      string `json:"Subdivision"`
+	Coordinates string `json:"Coordinates"`
+}
+
+type LOCK struct {
+	Link string `fauna:"link"`
+	Data string `fauna:"data"`
+}
+
+type DATA map[string]f.Value
+type rv f.RefV
+
+func main() {
+
+	var (
+		data DATA
+		rvs  []rv
+	)
+
+	id := "job"
+
+	ep := f.Endpoint("https://db.fauna.com:443")
+
+	c := f.NewFaunaClient("fnADYe7V_gACAVjhSAxGn5c7ZQMd-5elmlIGzSue", ep)
+
+	x, err := c.Query(f.CreateKey(f.Obj{"database": f.Database("access"), "role": "admin"}))
+	if err != nil {
+		fmt.Print(err)
+	}
+
+	var acc ACCESS
+
+	x.Get(&acc)
+
+	d := f.NewFaunaClient(acc.Secret, ep)
+
+	x, err = d.Query(f.Paginate(f.Documents(f.ScopedCollection("LOCK", f.Database(strings.ToUpper(id)))), f.Size(100)))
+	if err != nil {
+		fmt.Print(err)
+	}
+
+	if err = x.Get(&data); err != nil {
+		fmt.Print(err)
+	}
+
+	x = data["data"]
+
+	if err = x.Get(&rvs); err != nil {
+		fmt.Print(err)
+	}
+
+	sort.SliceStable(rvs, func(i, j int) bool {
+		return rvs[i].ID < rvs[j].ID
+	})
+
+	var l LOCK
+
+	for _, v := range rvs {
+
+		x, err = d.Query(f.Get(f.Ref(f.ScopedCollection("LOCK", f.Database(strings.ToUpper(id))), v.ID)))
+
+		if err != nil {
+			fmt.Print(err)
+		}
+
+		if err = x.Get(&data); err != nil {
+			fmt.Print(err)
+		}
+
+		x = data["data"]
+
+		x.Get(&l)
+
+		fmt.Println(l.Data)
+
+	}
+
+}
