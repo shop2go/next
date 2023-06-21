@@ -1,11 +1,11 @@
-package handler
+package data
 
 import (
 	"context"
 	"encoding/json"
 	"fmt"
 	"html/template"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"sort"
@@ -71,7 +71,7 @@ func templ(id string) (GIST, error) {
 
 	defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return GIST{}, err
 	}
@@ -102,7 +102,7 @@ func Data1(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, err)
 	}
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		fmt.Fprint(w, err)
 	}
